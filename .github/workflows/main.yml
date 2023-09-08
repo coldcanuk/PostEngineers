@@ -15,12 +15,6 @@ jobs:
         node-version: '20'
     - name: Install dependencies
       run: npm install
-    - name: Install Azure CLI
-      run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    - name: Azure Login
-      run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-    - name: Azure Container Registry Login
-      run: az acr login --name acrpostengineers
     - name: Build Discord Bot with Docker Compose
       env:
         DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
@@ -28,9 +22,20 @@ jobs:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      run: docker-compose build discord-bot && docker tag postengineers_discord-bot:latest acrpostengineers.azurecr.io/discord-bot:latest
+      run: docker-compose build discord-bot && docker tag discord-bot:latest acrpostengineers.azurecr.io/discord-bot:latest
+    - name: Docker Login to Azure
+      run: echo "${{ secrets.AZURE_CLIENT_SECRET }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_CLIENT_ID }} --password-stdin
     - name: Push Discord Bot Image to Azure
       run: docker push acrpostengineers.azurecr.io/discord-bot:latest
+    - name: Deploy to Azure Container Instance
+      env:
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      run: |
+        az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+        if az container show --name discord-bot --resource-group rgrouppostengineers --output table ; then
+          az container start --name discord-bot --resource-group rgrouppostengineers
+        else
+          az container create --name discord-bot --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/discord-bot:latest --cpu 1 --memory 1Gi
+        fi

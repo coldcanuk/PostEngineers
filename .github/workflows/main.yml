@@ -28,8 +28,8 @@ jobs:
         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       run: |
         az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-        az container show --name discord-bot --resource-group rgrouppostengineers --output table || true
-        if [ $? -eq 0 ]; then
+        az container show --name discord-bot --resource-group rgrouppostengineers --output table || container_exists=$?
+        if [ "$container_exists" -eq 0 ]; then
           az container start --name discord-bot --resource-group rgrouppostengineers
         else
           az container create --name discord-bot --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/discord-bot:latest --cpu 1 --memory 1Gi

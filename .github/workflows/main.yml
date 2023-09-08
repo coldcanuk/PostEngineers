@@ -12,7 +12,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '16'
+        node-version: '20'
     - name: Install dependencies
       run: npm install
     - name: Build Discord Bot with Docker Compose
@@ -22,28 +22,8 @@ jobs:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      run: docker-compose build discord-bot
+      run: docker-compose build discord-bot && docker tag discord-bot:latest docker.io/library/discord-bot:latest
     - name: Docker Login
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
     - name: Push Discord Bot Image
-      env:
-        DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
-        DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      run: docker-compose push discord-bot
-    - name: Login to Azure
-      run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-    - name: Push Discord Bot Docker image to Azure
-      run: docker push discord-bot:latest
-    - name: Set Environment Variables
-      run: |
-        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
-        echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> $GITHUB_ENV
+      run: docker push docker.io/library/discord-bot:latest

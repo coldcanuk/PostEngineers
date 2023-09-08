@@ -22,7 +22,7 @@ jobs:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-      run: docker-compose build discord-bot && docker tag discord-bot:latest acrpostengineers.azurecr.io/discord-bot:latest
+      run: docker-compose build discord-bot && docker tag postengineers_discord-bot:latest acrpostengineers.azurecr.io/discord-bot:latest
     - name: Docker Login to Azure
       run: echo "${{ secrets.AZURE_CLIENT_SECRET }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_CLIENT_ID }} --password-stdin
     - name: Push Discord Bot Image to Azure

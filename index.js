@@ -1,5 +1,9 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const { OpenAI } = require('openai');
+// verbose debugging
+console.log(`Debug: OPENAI_API_KEY exists? ${!!process.env.OPENAI_API_KEY}`);
+console.log(`Debug: DISCORD_TOKEN exists? ${!!process.env.DISCORD_TOKEN}`);
+// continue with code
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -8,10 +12,7 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
   ],
 });
-// verbose debugging
-console.log(`Debug: OPENAI_API_KEY exists? ${!!process.env.OPENAI_API_KEY}`);
-console.log(`Debug: DISCORD_TOKEN exists? ${!!process.env.DISCORD_TOKEN}`);
-// continue with code
+
 
 const openai = new OpenAI({ 
     apiKey: process.env.OPENAI_API_KEY 

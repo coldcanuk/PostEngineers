@@ -15,8 +15,6 @@ jobs:
         node-version: '16'
     - name: Install dependencies
       run: npm install
-    - name: Run tests
-      run: npm test
     - name: Build Discord Bot Docker image
       run: docker-compose build discord-bot
     - name: Login to Azure

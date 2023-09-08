@@ -32,5 +32,5 @@ jobs:
         if [ "$container_exists" -eq 0 ]; then
           az container start --name discord-bot --resource-group rgrouppostengineers
         else
-          az container create --name discord-bot --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/discord-bot:latest --cpu 1 --memory 1Gi
+          az container create --name discord-bot --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/discord-bot:latest --cpu 1 --memory 1G
         fi

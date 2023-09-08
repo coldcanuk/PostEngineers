@@ -26,6 +26,8 @@ jobs:
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
       run: |
         az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-        az container create --name discord-bot --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/discord-bot:latest --cpu 1 --memory 1 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }}
+        az container create --name discord-bot --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/discord-bot:latest --cpu 1 --memory 1 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }} --environment-variables OPENAI_API_KEY=$OPENAI_API_KEY DISCORD_TOKEN=$DISCORD_TOKEN

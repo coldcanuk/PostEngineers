@@ -1,0 +1,17 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "latest",
+    "openai": "latest",
+    "passport-discord": "latest",
+    "express": "latest",
+    "express-session": "latest",
+    "passport": "latest",
+    "dotenv": "latest"
+  }
+}

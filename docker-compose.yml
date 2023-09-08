@@ -1,0 +1,23 @@
+version: '3'
+services:
+  discord-bot:
+    build: .
+    environment:
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+  terraform:
+    build:
+      context: .
+      dockerfile: Dockerfile.terraform
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["az login --service-principal -u $$AZURE_CLIENT_ID -p $$AZURE_CLIENT_SECRET --tenant $$AZURE_TENANT_ID && terraform init && terraform apply"]

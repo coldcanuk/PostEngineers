@@ -1,0 +1,6 @@
+FROM hashicorp/terraform:latest
+
+RUN apk add --no-cache curl tar openssl sudo bash jq python3 py3-pip \
+    && apk --no-cache add --virtual=build gcc libffi-dev musl-dev openssl-dev python3-dev make \
+    && pip3 --no-cache-dir install --upgrade pip \
+    && pip3 --no-cache-dir install azure-cli

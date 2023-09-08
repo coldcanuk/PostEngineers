@@ -18,7 +18,7 @@ jobs:
     - name: Build Discord Bot with Docker Compose
       run: docker-compose build discord-bot && docker tag postengineers_discord-bot:latest acrpostengineers.azurecr.io/discord-bot:latest
     - name: Docker Login to Azure
-      run: echo "${{ secrets.AZURE_CLIENT_SECRET }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_CLIENT_ID }} --password-stdin
+      run: echo "${{ secrets.AZURE_REGISTRY_PASSWORD_1 }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} --password-stdin
     - name: Push Discord Bot Image to Azure
       run: docker push acrpostengineers.azurecr.io/discord-bot:latest
     - name: Deploy to Azure Container Instance
@@ -32,5 +32,5 @@ jobs:
         if [ "$container_exists" -eq 0 ]; then
           az container start --name discord-bot --resource-group rgrouppostengineers
         else
-          az container create --name discord-bot --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/discord-bot:latest --cpu 1 --memory 1
+          az container create --name discord-bot --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/discord-bot:latest --cpu 1 --memory 1G --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }}
         fi

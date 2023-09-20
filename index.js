@@ -1,3 +1,4 @@
+// version 1.1
 const { Client, GatewayIntentBits } = require('discord.js');
 const { OpenAI } = require('openai');
 // verbose debugging

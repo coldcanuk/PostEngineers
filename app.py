@@ -74,4 +74,4 @@ async def post(ctx, *, text: str):
         await ctx.send('Something went wrong.')
 
 if __name__ == '__main__':
-    bot.run(DISCORD_TOKEN, log_handler=None)
+    bot.run(DISCORD_TOKEN)

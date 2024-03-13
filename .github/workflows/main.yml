@@ -9,36 +9,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
 
-    - name: Install dependencies
-      run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-    - name: Build Docker Image
-      run: docker build . -t postengineers:latest && docker tag postengineers:latest acrpostengineers.azurecr.io/postengineers:latest
+      - name: Build Docker Image
+        run: docker build . -t postengineers:latest && docker tag postengineers:latest acrpostengineers.azurecr.io/postengineers:latest
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Docker Login to Azure
-      run: echo "${{ secrets.AZURE_REGISTRY_PASSWORD_1 }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} --password-stdin
+      - name: Docker Login to Azure
+        run: echo "${{ secrets.AZURE_REGISTRY_PASSWORD_1 }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} --password-stdin
 
-    - name: Push Docker Image to Azure
-      run: docker push acrpostengineers.azurecr.io/postengineers:latest
+      - name: Push Docker Image to Azure
+        run: docker push acrpostengineers.azurecr.io/postengineers:latest
 
-    - name: Deploy to Azure Container Instance
-      env:
-        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-      run: |
-        az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-        az container create --name postengineers --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/postengineers:latest --cpu 1 --memory 1 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }} --environment-variables OPENAI_API_KEY=$OPENAI_API_KEY DISCORD_TOKEN=$DISCORD_TOKEN
-        az container start --resource-group rgrouppostengineers --name postengineers
+      - name: Deploy to Azure Container Instance
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+        run: |
+          az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+          az container create --name postengineers --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/postengineers:latest --cpu 1 --memory 1 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }} --environment-variables OPENAI_API_KEY=$OPENAI_API_KEY DISCORD_TOKEN=$DISCORD_TOKEN
+          az container start --resource-group rgrouppostengineers --name postengineers

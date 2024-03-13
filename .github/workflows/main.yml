@@ -46,6 +46,8 @@ jobs:
       - name: Load Docker Image
         run: docker load < postengineers.tar
 
+      - name: Re-tag Docker Image
+        run: docker tag postengineers:latest acrpostengineers.azurecr.io/postengineers:latest
 
       - name: Docker Login to Azure
         run: echo "${{ secrets.AZURE_REGISTRY_PASSWORD_1 }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} --password-stdin

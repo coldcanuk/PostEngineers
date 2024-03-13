@@ -5,9 +5,13 @@ from discord.ext import commands
 import discord
 from loguru import logger
 from openai import OpenAI
-
-client = OpenAI(api_key=OPENAI_API_KEY)
 from openai import AsyncOpenAI
+
+# Load environment variables
+DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# Create the client
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Setup logging based on an environment variable
 DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't')
@@ -21,10 +25,6 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-
-# Load environment variables
-DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Check if environment variables are loaded (at appropriate logging level)
 logger.debug(f"DISCORD_TOKEN loaded: {'Yes' if DISCORD_TOKEN else 'No'}")

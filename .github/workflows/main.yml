@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,10 +23,30 @@ jobs:
       - name: Build Docker Image
         run: docker build . -t postengineers:latest && docker tag postengineers:latest acrpostengineers.azurecr.io/postengineers:latest
 
-  deploy:
-    needs: build
+      - name: Save Docker Image
+        run: docker save postengineers:latest > postengineers.tar
+
+      - name: Upload Docker Image as Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: postengineers-image
+          path: postengineers.tar
+
+  Deploy:
+    needs: Build
     runs-on: ubuntu-latest
     steps:
+
+      - name: Download Docker Image Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: postengineers-image
+          path: .
+
+      - name: Load Docker Image
+        run: docker load < postengineers.tar
+
+
       - name: Docker Login to Azure
         run: echo "${{ secrets.AZURE_REGISTRY_PASSWORD_1 }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} --password-stdin
 

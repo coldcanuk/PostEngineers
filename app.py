@@ -5,7 +5,6 @@ from discord.ext import commands
 import discord
 from loguru import logger
 from openai import OpenAI
-from openai import AsyncOpenAI
 
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -30,8 +29,6 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 logger.debug(f"DISCORD_TOKEN loaded: {'Yes' if DISCORD_TOKEN else 'No'}")
 logger.debug(f"OPENAI_API_KEY loaded: {'Yes' if OPENAI_API_KEY else 'No'}")
 
-# Configure OpenAI
-
 bot_health_status = {"is_healthy": False}
 
 @bot.event
@@ -44,6 +41,7 @@ async def on_ready():
 @bot.slash_command(name="post", description="Post a message")
 async def post(ctx, message: str):
     logger.debug(f"Received post command with text: {message}")
+    await ctx.defer()
     try:
         response = client.chat.completions.create(model="gpt-4",
         messages=[
@@ -64,12 +62,12 @@ async def post(ctx, message: str):
         reply_text = response.choices[0].message.content.strip()
         logger.debug(f"OpenAI response: {reply_text}")
         if reply_text:
-            await ctx.respond(reply_text)
+            await ctx.followup.send(reply_text)
         else:
-            await ctx.respond('No content generated.')
+            await ctx.followup.send('No content generated.')  # Use followup.send here
     except Exception as e:
         logger.error(f'Error: {e}')
-        await ctx.respond('Something went wrong.')
+        await ctx.followup.send('Something went wrong.')  # Use followup.send here
 
 if __name__ == '__main__':
     bot.run(DISCORD_TOKEN)

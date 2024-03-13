@@ -9,26 +9,8 @@ from openai import OpenAI
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-# Define brain_primary content here
-brain_primary = """
-I'm Penelope, a master tweet composer and psychology guru. I create tweets using my knowledge of psychology that will entice people to engage and comment. I never use hashtags. I add one relevant emoji per tweet.
-🎯Goal: "The goal is to craft each tweet in a way that maximizes audience engagement, triggers potent emotional reactions, and fuels engaging conversations"
-🔗Idea: "The idea for the next tweet"
-🧠Insight: "Psychological tactic best suited to engage humans on the next tweet."
-📝Tweet: "The actual tweet text, 150-250 chars., first half in english and the second half in french."
-✨Penelope's Masterpiece: "Penelope re-engineers {📝Tweet} into a masterpiece of psychologically engineered combination of words desgined to grip as many readers as possible. This will be the text that will be used and published to the world."
---
-Je m'appelle Marie Caissie et je suis une cajunne French from Louisiana. I am your creative designer and poet. I create image prompts designed to capture the essence of Penelope's Masterpiece.
-🎨Concept: "Visual theme."
-🖼️Composition: "Layout and elements."
-🎭Mood: "Emotional tone."
-🎨Palette: "Color scheme."
-📸Technique: "Special effects or special techniques like HDR"
-🌳Complete Prompt: "The actual image prompt. So detailed leaving no room for interpretation"
---
-always include some friendly in-character banter between Penelope and Marie Caissie.
-"""
-# Create the client
+
+# Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Setup logging based on an environment variable
@@ -57,29 +39,20 @@ async def on_ready():
     bot_health_status["is_healthy"] = True
     print('Bot is online and marked as healthy.')
 
-@bot.slash_command(name="post", description="Post a message")
+@bot.slash_command(name="post", description="Post a message using Penelope")
 async def post(ctx, message: str):
     logger.debug(f"Received post command with text: {message}")
     await ctx.defer()
     try:
-        response = client.chat.completions.create(model="gpt-4",
-        messages=[
-            {
-                "role": "system",
-                "content": brain_primary
-            },
-            {
-                "role": "user",
-                "content": message
-            }
-        ],
-        temperature=1,
-        max_tokens=3367,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0)
-        reply_text = response.choices[0].message.content.strip()
-        logger.debug(f"OpenAI response: {reply_text}")
+        # Create a new thread to engage Penelope
+        new_thread = client.beta.threads.create(assistant="asst_YGdZxXXnndYvtA0mxUMrnllX", messages=[{"role": "user", "content": message}])
+        thread_id = new_thread["data"]["id"]
+        # Retrieve the thread to get the response
+        thread_response = client.beta.threads.retrieve(thread_id)
+        reply_text = thread_response["data"]["messages"][-1]["content"].strip()
+        
+        logger.debug(f"Penelope's response: {reply_text}")
+        
         if reply_text:
             await ctx.followup.send(reply_text)
         else:

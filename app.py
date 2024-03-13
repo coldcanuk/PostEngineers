@@ -36,9 +36,16 @@ async def post(ctx, message: str):
     logger.debug(f"Received post command with text: {message}")
     await ctx.defer()
     try:
-        # Step 2 & 3: Create a thread and add a message to the thread
+        # Step 2 Create a thread
         thread = client.beta.threads.create()
         logger.debug(f"the thread ID is {thread.id} or {thread.data.id}")
+        # Step 3 Add a message to the thread
+        message = client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content= {message}
+        )
+        #
         # Step 4: Create and stream a run
         response = client.beta.threads.runs.create_and_stream(
             thread_id=thread['data']['id'],

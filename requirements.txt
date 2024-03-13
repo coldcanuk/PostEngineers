@@ -4,3 +4,4 @@ redis==4.3.4
 python-dotenv==0.20.0
 openai==0.22.0
 py-cord==2.5.0
+loguru==0.5.3

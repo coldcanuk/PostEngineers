@@ -1,16 +1,6 @@
-# Use Node.js latest
-FROM node:latest
-
-# Set working directory
+FROM python:3.11-slim
 WORKDIR /app
-
-# Install app dependencies
-COPY package*.json ./
-RUN npm install
-
-# Bundle app source
-COPY . .
-RUN rm -f .env
-
-# Start the app
-CMD [ "npm", "start" ]
+COPY app.py requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 5000
+CMD ["flask", "run", "--host=0.0.0.0"]

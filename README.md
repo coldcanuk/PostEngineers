@@ -1,4 +1,4 @@
-# Discord Bot with Azure and Terraform
+# Discord Bot with Azure, Flask, and Terraform
 
 ## Table of Contents:
 1. [Introduction](#introduction)
@@ -13,52 +13,45 @@
 10. [License](#license)
 
 ## Introduction
-This repository contains a Discord bot that leverages OpenAI's GPT-4. The bot is containerized using Docker and deployed on Azure Container Instances. This README provides a step-by-step guide to get you up and running.
+This repository contains a Discord bot that leverages OpenAI's GPT-4, developed in Python and Flask. The bot is containerized using Docker and deployed on Azure Container Instances. This README guides you through setting up and deploying the project.
 
 ## Prerequisites
-- Node.js v20 or higher
+- Python 3.11 or higher
+- Flask
 - Docker
 - Azure CLI
 - Terraform
 - GitHub account
 
 ## Azure Setup
-1. Install Azure CLI: [https://docs.microsoft.com/en-us/cli/azure/install-azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-2. Run `az login` to sign in to your Azure account.
-3. Create a resource group: `az group create --name <ResourceGroupName> --location <Location>`
-4. Create Azure Container Registry: `az acr create --resource-group <ResourceGroupName> --name <RegistryName> --sku Basic`
+Follow the same steps as outlined previously to install the Azure CLI, sign in to your Azure account, create a resource group, and set up Azure Container Registry.
 
 ## Terraform Setup
-1. Install Terraform: [https://learn.hashicorp.com/tutorials/terraform/install-cli](https://learn.hashicorp.com/tutorials/terraform/install-cli)
-2. Initialize Terraform: `terraform init`
-3. Validate the configuration: `terraform validate`
-4. Apply the configuration: `terraform apply`
+No changes from the previous setup. Follow the original steps to install and initialize Terraform.
 
 ## GitHub Actions and Secrets
-1. Go to your GitHub repo -> Settings -> Secrets.
-2. Add the following secrets:
-  - AZURE_TENANT_ID
-  - AZURE_CLIENT_ID
-  - AZURE_CLIENT_SECRET
-  - AZURE_REGISTRY_USERNAME
-  - AZURE_REGISTRY_PASSWORD_1
-  - OPENAI_API_KEY
-  - DISCORD_TOKEN
+Ensure the following secrets are configured in your GitHub repository:
+- AZURE_TENANT_ID
+- AZURE_CLIENT_ID
+- AZURE_CLIENT_SECRET
+- AZURE_REGISTRY_USERNAME
+- AZURE_REGISTRY_PASSWORD
+- OPENAI_API_KEY
+- DISCORD_TOKEN
+
+Adjust any steps as necessary for Python and Flask specific configurations.
 
 ## Deployment
-1. Push to the 'main' branch.
-2. GitHub Actions will automatically build the Docker image and deploy it to Azure.
+Deployment via GitHub Actions remains unchanged. Pushing to the 'main' branch triggers the CI/CD pipeline to build the Docker image and deploy it to Azure.
 
 ## Post-Deployment Steps
-1. Verify the container instance is running: `az container show --name <ContainerName> --resource-group <ResourceGroupName>`
-2. Fetch logs if needed: `az container logs --name <ContainerName> --resource-group <ResourceGroupName>`
+Use Azure CLI commands to verify the container instance is running and fetch logs if needed.
 
 ## Troubleshooting
-- Check Azure logs: `az container logs --name <ContainerName> --resource-group <ResourceGroupName>`
-- Make sure GitHub Actions Secrets are correctly set.
+Review Azure container logs and ensure all GitHub Actions Secrets are correctly set for the Python and Flask environment.
 
 ## Contributing
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details on code conduct and the pull request process.
+Contributions are welcome! Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for code conduct and pull request guidelines.
 
 ## License
 This project is licensed under the GNU General Public License v3.0. Developed with assistance from OpenAI's GPT-4 and ChatGPT.

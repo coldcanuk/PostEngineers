@@ -38,7 +38,7 @@ async def post(ctx, message: str):
     try:
         # Step 2 Create a thread
         thread = client.beta.threads.create()
-        logger.debug(f"the thread ID is {thread.id} or {thread.data.id}")
+        logger.debug(f"the thread ID is {thread.id}")
         # Step 3 Add a message to the thread
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
@@ -48,7 +48,7 @@ async def post(ctx, message: str):
         #
         # Step 4: Create and stream a run
         response = client.beta.threads.runs.create_and_stream(
-            thread_id=thread['data']['id'],
+            thread_id=thread.id,
             assistant_id="asst_YGdZxXXnndYvtA0mxUMrnllX",
             inputs=[{"type": "text_input", "data": {"text": message}}],
         )

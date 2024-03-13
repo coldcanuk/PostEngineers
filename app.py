@@ -35,6 +35,9 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
 async def on_ready():
     logging.info('Bot is online.')
+    global bot_health_status
+    bot_health_status["is_healthy"] = True
+    print('Bot is online and marked as healthy.')
 
 @bot.command(name='post')
 async def post(ctx, *, text: str):
@@ -72,5 +75,5 @@ if __name__ == '__main__':
     bot.run(DISCORD_TOKEN, log_handler=None)
 
 @app.route('/health')
-def health():
-    return "OK", 200
+def health_check():
+    return jsonify(bot_health_status)

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 import os
 import openai
 from discord.ext import commands
@@ -27,6 +27,8 @@ openai.api_key = OPENAI_API_KEY
 intents = Intents.default()
 intents.messages = True
 intents.guilds = True
+
+bot_health_status = {"is_healthy": False}
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -68,3 +70,7 @@ async def post(ctx, *, text: str):
 
 if __name__ == '__main__':
     bot.run(DISCORD_TOKEN, log_handler=None)
+
+@app.route('/health')
+def health():
+    return "OK", 200

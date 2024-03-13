@@ -29,27 +29,27 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
 async def on_ready():
     logger.info('Bot is online and ready.')
-    bot_health_status = {"is_healthy": True}
     print('Bot is online and marked as healthy.')
 
-@bot.slash_command(name="post", description="Post a message using Penelope")
+@bot.slash_command(name="post", description="Invoke Penelope for a message")
 async def post(ctx, message: str):
     logger.debug(f"Received post command with text: {message}")
     await ctx.defer()
     try:
-        # Step 2: Add a message to the thread
-        thread_response = client.assistants.create_run(
+        # Step 2 & 3: Create a thread and add a message to the thread
+        thread = client.beta.threads.create()
+
+        # Step 4: Create and stream a run
+        response = client.beta.threads.runs.create_and_stream(
+            thread_id=thread['data']['id'],
             assistant_id="asst_YGdZxXXnndYvtA0mxUMrnllX",
-            inputs=[{"type": "text", "data": message}]
+            inputs=[{"type": "text_input", "data": {"text": message}}],
         )
 
-        # Extract Penelope's response
-        if thread_response['choices']:
-            reply_text = thread_response['choices'][0]['message']['content'].strip()
-            logger.debug(f"Penelope's response: {reply_text}")
-            await ctx.followup.send(reply_text)
-        else:
-            await ctx.followup.send('No content generated.')
+        reply_text = next(response.iter_lines())  # This is a simplistic approach; customize as needed.
+
+        logger.debug(f"Penelope's response: {reply_text}")
+        await ctx.followup.send(reply_text)
     except Exception as e:
         logger.error(f'Error: {e}')
         await ctx.followup.send('Something went wrong.')

@@ -1,26 +1,34 @@
 name: CI/CD Pipeline
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        node-version: '20'
+        python-version: '3.11'
+
     - name: Install dependencies
-      run: npm install
-    - name: Build Discord Bot with Docker Compose
-      run: docker-compose build discord-bot && docker tag postengineers_discord-bot:latest acrpostengineers.azurecr.io/discord-bot:latest
+      run: pip install -r requirements.txt
+
+    - name: Build Docker Image
+      run: docker build . -t postengineers:latest && docker tag postengineers:latest acrpostengineers.azurecr.io/postengineers:latest
+
     - name: Docker Login to Azure
       run: echo "${{ secrets.AZURE_REGISTRY_PASSWORD_1 }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} --password-stdin
-    - name: Push Discord Bot Image to Azure
-      run: docker push acrpostengineers.azurecr.io/discord-bot:latest
+
+    - name: Push Docker Image to Azure
+      run: docker push acrpostengineers.azurecr.io/postengineers:latest
+
     - name: Deploy to Azure Container Instance
       env:
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -30,4 +38,4 @@ jobs:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
       run: |
         az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-        az container create --name discord-bot --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/discord-bot:latest --cpu 1 --memory 1 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }} --environment-variables OPENAI_API_KEY=$OPENAI_API_KEY DISCORD_TOKEN=$DISCORD_TOKEN
+        az container create --name postengineers --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/postengineers:latest --cpu 1 --memory 1 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }} --environment-variables OPENAI_API_KEY=$OPENAI_API_KEY DISCORD_TOKEN=$DISCORD_TOKEN

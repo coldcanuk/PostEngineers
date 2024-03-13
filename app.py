@@ -33,7 +33,7 @@ bot_health_status = {"is_healthy": False}
 
 @bot.event
 async def on_ready():
-    logger.info('Bot is online.')
+    logger.info('Bot is online and ready.')
     global bot_health_status
     bot_health_status["is_healthy"] = True
     print('Bot is online and marked as healthy.')

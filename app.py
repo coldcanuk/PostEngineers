@@ -72,9 +72,5 @@ async def post(ctx, *, text: str):
         logger.error(f'Error: {e}')
         await ctx.send('Something went wrong.')
 
-@app.route('/health')
-def health_check():
-    return jsonify(bot_health_status)
-
 if __name__ == '__main__':
     bot.run(DISCORD_TOKEN, log_handler=None)

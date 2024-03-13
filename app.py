@@ -1,18 +1,25 @@
 import sys
-from flask import Flask, jsonify
 import os
 import openai
+from flask import Flask
 from discord.ext import commands
 from discord import Intents
 from loguru import logger
+from discord_slash import SlashCommand, SlashContext
 
 # Setup logging based on an environment variable
 DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't')
 log_level = "DEBUG" if DEBUG_MODE else "INFO"
-
 logger.add(sys.stdout, level=log_level)  # Output logs to stdout
 
 app = Flask(__name__)
+
+# Configure Discord
+intents = Intents.default()
+intents.messages = True
+intents.guilds = True
+bot = commands.Bot(command_prefix='!', intents=intents)
+slash = SlashCommand(bot, sync_commands=True) # This synchronizes slash commands with Discord.
 
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -25,14 +32,7 @@ logger.debug(f"OPENAI_API_KEY loaded: {'Yes' if OPENAI_API_KEY else 'No'}")
 # Configure OpenAI
 openai.api_key = OPENAI_API_KEY
 
-# Configure Discord
-intents = Intents.default()
-intents.messages = True
-intents.guilds = True
-
 bot_health_status = {"is_healthy": False}
-
-bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
@@ -41,9 +41,14 @@ async def on_ready():
     bot_health_status["is_healthy"] = True
     print('Bot is online and marked as healthy.')
 
-@bot.command(name='post')
-async def post(ctx, *, text: str):
-    logger.debug(f"Received post command with text: {text}")
+@slash.slash(name="post", description="Post a message", options=[{
+    "name": "message",
+    "description": "Your message",
+    "type": 3,
+    "required": True,
+}])
+async def post(ctx: SlashContext, message: str):
+    logger.debug(f"Received post command with text: {message}")
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -54,7 +59,7 @@ async def post(ctx, *, text: str):
                 },
                 {
                     "role": "user",
-                    "content": text
+                    "content": message  # Note the variable name change here from 'text' to 'message' to match the function parameter
                 }
             ],
             temperature=1,
@@ -66,12 +71,13 @@ async def post(ctx, *, text: str):
         reply_text = response.choices[0].message.content.strip()
         logger.debug(f"OpenAI response: {reply_text}")
         if reply_text:
-            await ctx.send(reply_text)
+            # Note the change from ctx.send to ctx.respond for slash command responses
+            await ctx.respond(reply_text)
         else:
-            await ctx.send('No content generated.')
+            await ctx.respond('No content generated.')
     except Exception as e:
         logger.error(f'Error: {e}')
-        await ctx.send('Something went wrong.')
+        await ctx.respond('Something went wrong.')
 
 if __name__ == '__main__':
     bot.run(DISCORD_TOKEN)

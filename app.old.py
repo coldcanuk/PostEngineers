@@ -10,25 +10,23 @@ from openai import OpenAI
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-
+ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
+assistant_id_p = str(ASSISTANT_PENELOPE)
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
-
 # Setup logging
-DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't')
+DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't', 'on')
 log_level = "DEBUG" if DEBUG_MODE else "INFO"
-logger.add(sys.stdout, level=log_level)
-
+logger.remove()  # Removes all handlers
+logger.add(sys.stdout, level=log_level)  # Re-add with the desired level
+logger.info(f"DEBUG_MODE: {DEBUG_MODE}") 
+logger.debug(assistant_id_p)
 app = Flask(__name__)
-
 # Configure Discord
 intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-
-# Configure OpenAI Assistants
-assistant_id_p = "asst_YGdZxXXnndYvtA0mxUMrnllX"  # Penelope
 
 # Event Handlers
 @bot.event
@@ -45,59 +43,48 @@ async def post(ctx, message: str):
         reply_text = "Penelope is pondering your request..."
         logger.debug(f"Penelope's response: {reply_text}")
         await ctx.followup.send(reply_text)
-        logger.debug("begin client.beta.threads.create")
         thread_response = client.beta.threads.create()
-        logger.debug("finished client.beta.threads.create")
-        
-        # Adjusted to correctly extract thread ID from the response object
-        logger.debug("begin populating variable for the thread id")
-        varThread_id = thread_response.id  # Adjust this based on the actual attribute/method
-        logger.debug(f"Thread ID: {varThread_id}")
-        logger.debug(f"Begin beta.threads.messages.create")
+        varThread_id = thread_response.id
         client.beta.threads.messages.create(
             thread_id=varThread_id,
             role="user",
             content=message
         )
-        logger.debug(f"Finish beta.threads.messages.create")
-        logger.debug(f"Begin beta.threads.runs.create")
+        logger.debug(f"We are now going to create our run")
         run = client.beta.threads.runs.create(
             thread_id=varThread_id,
             assistant_id=assistant_id_p,
-            instructions="Please provide a detailed response."
+            #instructions="Please provide a detailed response. Always include emojis and you must always follow your preconfigured instructions."
+            instructions="""
+            I'm Penelope, a master tweet composer and psychology guru. I create tweets using my knowledge of psychology that will entice people to engage and comment. I never use hashtags. I add one relevant emoji per tweet.
+            🎯Goal: "The goal is to craft each tweet in a way that maximizes audience engagement, triggers potent emotional reactions, and fuels engaging conversations"
+            🔗Idea: "The idea for the next tweet"
+            🧠Insight: "Psychological tactic best suited to engage humans on the next tweet."
+            📝Tweet: "The actual tweet text, 150-250 chars., first half in english and the second half in french."
+            ✨Penelope's Masterpiece: "Penelope re-engineers {📝Tweet} into a masterpiece of psychologically engineered combination of words desgined to grip as many readers as possible. This will be the text that will be used and published to the world."
+            ------
+            """
         )
-        logger.debug(f"Finished beta.threads.runs.create")
+        logger.debug(f"Begin the while loop")
         while run.status in ['queued', 'in_progress', 'cancelling']:
             time.sleep(1)
             intCount += 1
-            reply_text = "Penelope has been thinking for " + str(intCount) + " seconds."
-            await ctx.followup.send(reply_text)
+            if DEBUG_MODE:
+              reply_text = f"Penelope has been thinking for {intCount} seconds."
+              await ctx.followup.send(reply_text)
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
-        logger.debug(f"begin the condition check")
         if run.status == 'completed':
-            logger.debug(f"we have matched completed for run.status condition check")
+            logger.debug(f"run.status has matched completed")
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
             for msg in listMessages.data:
                 if msg.role == 'assistant':
-                    logger.debug(f"we have matched msg.role equal assistant")
-                    # Extracting the text value from each message
-                    logger.debug(f"Check if the msg has the text_content attribute")
-                    # logger.debug(msg) # only uncomment if something buggerred and you need to see a dump of the variable in the log
-                    if hasattr(msg, 'text_content'):  # Check if the msg has the text_content attribute
-                        logger.debug(f"Begin to Iterate through content blocks")
-                        ii = 0
-                        for content_block in msg.text_content:  # Iterate through content blocks
-                            logger.debug(f"This is interation number: ") + str(ii)
-                            ii += 1
-                            if content_block.type == 'text':  # Ensure we're dealing with text content
-                                logger.debug("content_block.type is equal to text which means we are dealing with text content")
-                                text_value = content_block.text.value  # Extract the text value
-                                await ctx.followup.send(text_value)
-        else:
-            logger.debug(f"we hit the else condition for run.status")
-            runStatus = run.status
-            logger.debug(f'Run Status: {runStatus}')
-        logger.debug(f"we are done the if else condition for run.status")
+                    # Direct extraction from the 'content' attribute of 'msg'
+                    for content_block in msg.content:  # Iterate through the 'content' list
+                        if content_block.type == 'text':  # Check for 'text' type content
+                            text_value = content_block.text.value  # Access the 'value' directly
+                            await ctx.followup.send(text_value)  # Send the extracted text
+                            return text_value
+        return None  # Return None if there's no text_value to return
     except Exception as e:
         logger.error(f'Error: {e}')
         await ctx.followup.send('Something went wrong.')

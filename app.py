@@ -73,7 +73,7 @@ async def post(ctx, message: str):
             reply_text = "Penelope has been thinking for " + str(intCount) + " seconds."
             await ctx.followup.send(reply_text)
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
-
+        logger.debug(f"begin the condition check")
         if run.status == 'completed':
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
             assistant_messages = [msg for msg in listMessages['data'] if msg['role'] == 'assistant']
@@ -82,7 +82,7 @@ async def post(ctx, message: str):
         else:
             runStatus = run.status
             logger.debug(f'Run Status: {runStatus}')
-
+        logger.debug(f"we are done the if else condition")
     except Exception as e:
         logger.error(f'Error: {e}')
         await ctx.followup.send('Something went wrong.')

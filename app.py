@@ -73,6 +73,7 @@ async def handle_post_command(message, assistant_id, instructions):
         while run.status in ['queued', 'in_progress', 'cancelling']:
             await asyncio.sleep(1)
             intCount += 1
+            logger.debug(f"We are at iteration: {intCount}")
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
         if run.status == 'completed':
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)

@@ -53,19 +53,20 @@ async def post(ctx, message: str):
         logger.debug("begin populating variable for the thread id")
         varThread_id = thread_response.id  # Adjust this based on the actual attribute/method
         logger.debug(f"Thread ID: {varThread_id}")
-
+        logger.debug(f"Begin beta.threads.messages.create")
         client.beta.threads.messages.create(
             thread_id=varThread_id,
             role="user",
             content=message
         )
-        
+        logger.debug(f"Finish beta.threads.messages.create")
+        logger.debug(f"Begin beta.threads.runs.create")
         run = client.beta.threads.runs.create(
             thread_id=varThread_id,
             assistant_id=assistant_id_p,
             instructions="Please provide a detailed response."
         )
-        
+        logger.debug(f"Finished beta.threads.runs.create")
         while run.status in ['queued', 'in_progress', 'cancelling']:
             time.sleep(1)
             intCount += 1

@@ -36,21 +36,15 @@ async def post(ctx, message: str):
     logger.debug(f"Received post command with text: {message}")
     await ctx.defer()
     try:
-        # Step 2 Create a thread
-        thread = client.beta.threads.create()
-        thread_id=thread['id']
-        logger.debug(f"the thread ID is {thread_id} ")
-        # Step 3 Add a message to the thread
-        message_response = client.beta.threads.messages.create(
-            thread_id=thread_id,
-            role="user",
-            content=message  # Correct way to pass the message
+        # Correct implementation for threading with the assistant
+        response = client.assistants.create_run(
+            assistant_id="asst_YGdZxXXnndYvtA0mxUMrnllX",
+            inputs=[{"type": "text_input", "data": {"text": message}}]
         )
-        # Step 4: Create and stream a run - this part needs adjustment based on API capabilities and desired behavior
-
-        # Simplification for demonstration - adjust according to actual requirements
-        reply_text = "Message received and processed by Penelope."  # Placeholder response
-
+        
+        # Assuming 'response' contains the desired output structure
+        reply_text = response['choices'][0]['message']['content'] if response['choices'] else 'No content generated.'
+        
         logger.debug(f"Penelope's response: {reply_text}")
         await ctx.followup.send(reply_text)
     except Exception as e:

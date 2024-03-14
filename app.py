@@ -75,7 +75,7 @@ async def post(ctx, message: str):
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
         logger.debug(f"begin the condition check")
         if run.status == 'completed':
-            logger.debug(f"we have matched completed")
+            logger.debug(f"we have matched completed for run.status condition check")
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
             for msg in listMessages.data:
                 if msg.role == 'assistant':
@@ -83,17 +83,20 @@ async def post(ctx, message: str):
                     # Extracting the text value from each message
                     logger.debug(f"Check if the msg has the text_content attribute")
                     if hasattr(msg, 'text_content'):  # Check if the msg has the text_content attribute
+                        logger.debug(f"Begin to Iterate through content blocks")
+                        ii = 0
                         for content_block in msg.text_content:  # Iterate through content blocks
+                            logger.debug(f"This is interation number: ") + str(ii)
+                            ii += 1
                             if content_block.type == 'text':  # Ensure we're dealing with text content
-                                logger.debug("Ensure we're dealing with text content")
+                                logger.debug("content_block.type is equal to text which means we are dealing with text content")
                                 text_value = content_block.text.value  # Extract the text value
                                 await ctx.followup.send(text_value)
-
         else:
-            logger.debug(f"we hit the else condition")
+            logger.debug(f"we hit the else condition for run.status")
             runStatus = run.status
             logger.debug(f'Run Status: {runStatus}')
-        logger.debug(f"we are done the if else condition")
+        logger.debug(f"we are done the if else condition for run.status")
     except Exception as e:
         logger.error(f'Error: {e}')
         await ctx.followup.send('Something went wrong.')

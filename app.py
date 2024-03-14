@@ -75,8 +75,10 @@ async def post(ctx, message: str):
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
         logger.debug(f"begin the condition check")
         if run.status == 'completed':
+            logger.debug(f"we have matched completed")
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
             assistant_messages = [msg for msg in listMessages['data'] if msg['role'] == 'assistant']
+            logger.debug(f"begin for loop")
             for msg in assistant_messages:
                 await ctx.followup.send(msg['content'])
         else:

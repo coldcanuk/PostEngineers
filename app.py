@@ -85,8 +85,8 @@ async def handle_post_command(message, assistant_id, instructions):
                 # This part is giving us trouble and we need to keep an eye on it.
                 reply_texts = []
                 for msg in listMessages.data:
-                  if msg['role'] == 'assistant':
-                    for content in msg['content']:
+                  if msg.role == 'assistant':
+                    for content in msg.content:
                       if content['type'] == 'text':
                         text_value = content['text']['value']
                         reply_texts.append(text_value)

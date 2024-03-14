@@ -19,7 +19,8 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't')
 log_level = "DEBUG" if DEBUG_MODE else "INFO"
 logger.add(sys.stdout, level=log_level)
-
+logger.info(ASSISTANT_PENELOPE)
+logger.info(assistant_id_p)
 app = Flask(__name__)
 
 # Configure Discord

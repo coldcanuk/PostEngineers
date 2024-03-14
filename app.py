@@ -77,11 +77,13 @@ async def post(ctx, message: str):
         if run.status == 'completed':
             logger.debug(f"we have matched completed")
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-            assistant_messages = [msg for msg in listMessages['data'] if msg['role'] == 'assistant']
-            logger.debug(f"begin for loop")
-            for msg in assistant_messages:
-                await ctx.followup.send(msg['content'])
+            # Adjusted approach to iterate through paginated messages properly
+            logger.debug(f"begin the for loop")
+            for msg in listMessages.data:
+                if msg.role == 'assistant':
+                    await ctx.followup.send(msg.content)
         else:
+            logger.debug(f"we hit the else condition")
             runStatus = run.status
             logger.debug(f'Run Status: {runStatus}')
         logger.debug(f"we are done the if else condition")

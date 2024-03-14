@@ -77,11 +77,15 @@ async def post(ctx, message: str):
         if run.status == 'completed':
             logger.debug(f"we have matched completed")
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-            # Adjusted approach to iterate through paginated messages properly
-            logger.debug(f"begin the for loop")
             for msg in listMessages.data:
                 if msg.role == 'assistant':
-                    await ctx.followup.send(msg.content)
+                    # Extracting the text value from each message
+                    if hasattr(msg, 'text_content'):  # Check if the msg has the text_content attribute
+                        for content_block in msg.text_content:  # Iterate through content blocks
+                            if content_block.type == 'text':  # Ensure we're dealing with text content
+                                text_value = content_block.text.value  # Extract the text value
+                                await ctx.followup.send(text_value)
+
         else:
             logger.debug(f"we hit the else condition")
             runStatus = run.status

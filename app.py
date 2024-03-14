@@ -17,7 +17,8 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
 DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't', 'on')
 log_level = "DEBUG" if DEBUG_MODE else "INFO"
-logger.add(sys.stdout, level=log_level)
+logger.remove()  # Removes all handlers
+logger.add(sys.stdout, level=log_level)  # Re-add with the desired level
 logger.info(f"DEBUG_MODE: {DEBUG_MODE}") 
 logger.debug(assistant_id_p)
 app = Flask(__name__)

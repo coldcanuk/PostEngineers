@@ -75,26 +75,26 @@ async def handle_post_command(message, assistant_id, instructions):
             intCount += 1
             logger.debug(f"We are at iteration: {intCount}")
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
-        if run.status == 'completed':
-          logger.debug(f"Run.status has matched completed")
-          try:
-            listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-            logger.debug(f"Total messages received: {len(listMessages.data)}")
+            if run.status == 'completed':
+              logger.debug(f"Run.status has matched completed")
+              try:
+                listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
+                logger.debug(f"Total messages received: {len(listMessages.data)}")
 
-            reply_texts = []
-            for msg in listMessages.data:
-              if msg.role == 'assistant':  # Ensuring only messages from the assistant are processed
-                for content in msg.content:
-                  if content.type == 'text':  # Check if the content block is of type 'text'
-                    text_value = content.text.value  # Access the text value
-                    reply_texts.append(text_value)
-                    logger.debug(f"Text value: {text_value[:50]}")  # Log the first 50 characters for preview
+                reply_texts = []
+                for msg in listMessages.data:
+                  if msg.role == 'assistant':  # Ensuring only messages from the assistant are processed
+                    for content in msg.content:
+                      if content.type == 'text':  # Check if the content block is of type 'text'
+                        text_value = content.text.value  # Access the text value
+                        reply_texts.append(text_value)
+                        logger.debug(f"Text value: {text_value[:50]}")  # Log the first 50 characters for preview
 
                 logger.debug(f"Preparing to return reply_texts. Total texts: {len(reply_texts)} | Content: {reply_texts[:3]}")  # Log preview of up to 3 texts
                 return reply_texts
-          except Exception as e:
-            logger.error(f"Error in handle_post_command: {e}")
-            return []
+              except Exception as e:
+                logger.error(f"Error in handle_post_command: {e}")
+                return []
           
     except Exception as e:
         logger.error(f"Error in handle_post_command: {e}")

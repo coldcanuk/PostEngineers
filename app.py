@@ -48,29 +48,30 @@ async def post(ctx, message: str):
         
         thread_response = client.beta.threads.create()
         varThread_id = thread_response['data']['id']
-
+        logger.debug(f"this is the thread id: {varThread_id}")
         client.beta.threads.messages.create(
             thread_id=varThread_id,
             role="user",
             content=message
         )
-
+        logger.debug(f"finished creating threads.messages")
+        logger.debug(f"creating threads.runs")
         run = client.beta.threads.runs.create(
             thread_id=varThread_id,
             assistant_id=assistant_id_p,
             instructions="Please provide a detailed response."
         )
-
+        logger.debug(f"finished creating threads.runs, begin while loop")
         while run.status in ['queued', 'in_progress', 'cancelling']:
             time.sleep(1)
-            intCount += 1  # Ah, the missing increment, like a map without North marked!
+            intCount += 1  
             reply_text = "Penelope has been thinking for " + str(intCount) + " seconds."
             await ctx.followup.send(reply_text)
             run = client.beta.threads.runs.retrieve(
                 thread_id=varThread_id,
                 run_id=run.id
             )
-
+        logger.debug(f"finished while loop, begin condition check")
         if run.status == 'completed':
             listMessages = client.beta.threads.messages.list(
                 thread_id=varThread_id

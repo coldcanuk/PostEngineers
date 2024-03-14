@@ -63,9 +63,10 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           ASSISTANT_PENELOPE: ${{ secrets.ASSISTANT_PENELOPE }}
+          DEBUG_MODE: ${{ secrets.DEBUG_MODE }}
         run: |
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-          az container create --name postengineers --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/postengineers:latest --cpu 1 --memory 1 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }} --environment-variables OPENAI_API_KEY=$OPENAI_API_KEY DISCORD_TOKEN=$DISCORD_TOKEN ASSISTANT_PENELOPE=$ASSISTANT_PENELOPE
+          az container create --name postengineers --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/postengineers:latest --cpu 1 --memory 1 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }} --environment-variables OPENAI_API_KEY=$OPENAI_API_KEY DISCORD_TOKEN=$DISCORD_TOKEN ASSISTANT_PENELOPE=$ASSISTANT_PENELOPE DEBUG_MODE=$DEBUG_MODE
           az container start --resource-group rgrouppostengineers --name postengineers
 
   SafetyCheck:

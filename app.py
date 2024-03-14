@@ -10,8 +10,8 @@ from openai import OpenAI
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-assistant_id_p = os.getenv('ASSISTANT_PENELOPE')
-
+ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
+assistant_id_p = ASSISTANT_PENELOPE
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 

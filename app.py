@@ -77,7 +77,7 @@ async def handle_post_command(message, assistant_id, instructions):
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
         if run.status == 'completed':
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-            logger.debug(f"Raw messages data: {listMessages.data}") # Log the raw message format to verify the structure
+            #logger.debug(f"Raw messages data: {listMessages.data}") # Log the raw message format to verify the structure
             # Extracting and logging just before the return
             reply_texts = [msg.content['text']['value'] for msg in listMessages.data if msg.role == 'assistant' and 'text' in msg.content and 'value' in msg.content['text']]
             logger.debug(f"Preparing to return reply_texts. Total texts: {len(reply_texts)} | Content: {reply_texts}")

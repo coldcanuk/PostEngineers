@@ -37,10 +37,10 @@ async def post(ctx, message: str):
     await ctx.defer()
     try:
         # Correctly engaging Penelope with threading
-        thread_response = client.threads.create()
+        thread_response = client.beta.threads.create()
         thread_id = thread_response['data']['id']
 
-        message_response = client.threads.create_message(thread_id=thread_id, 
+        message_response = client.beta.threads.create_message(thread_id=thread_id, 
                                                          assistant_id="asst_YGdZxXXnndYvtA0mxUMrnllX", 
                                                          input={"type": "text", "data": message})
         

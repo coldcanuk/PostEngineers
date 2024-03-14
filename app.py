@@ -79,10 +79,13 @@ async def post(ctx, message: str):
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
             for msg in listMessages.data:
                 if msg.role == 'assistant':
+                    logger.debug(f"we have matched msg.role equal assistant")
                     # Extracting the text value from each message
+                    logger.debug(f"Check if the msg has the text_content attribute")
                     if hasattr(msg, 'text_content'):  # Check if the msg has the text_content attribute
                         for content_block in msg.text_content:  # Iterate through content blocks
                             if content_block.type == 'text':  # Ensure we're dealing with text content
+                                logger.debug("Ensure we're dealing with text content")
                                 text_value = content_block.text.value  # Extract the text value
                                 await ctx.followup.send(text_value)
 

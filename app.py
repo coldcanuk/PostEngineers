@@ -82,6 +82,7 @@ async def post(ctx, message: str):
                     logger.debug(f"we have matched msg.role equal assistant")
                     # Extracting the text value from each message
                     logger.debug(f"Check if the msg has the text_content attribute")
+                    logger.debug(msg)
                     if hasattr(msg, 'text_content'):  # Check if the msg has the text_content attribute
                         logger.debug(f"Begin to Iterate through content blocks")
                         ii = 0

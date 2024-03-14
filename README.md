@@ -1,57 +1,62 @@
-# Discord Bot with Azure, Flask, and Terraform
+# Discord Bot with OpenAI, Flask, and Azure Deployment
 
 ## Table of Contents:
 1. [Introduction](#introduction)
 2. [Prerequisites](#prerequisites)
-3. [Azure Setup](#azure-setup)
-4. [Terraform Setup](#terraform-setup)
-5. [GitHub Actions and Secrets](#github-actions-and-secrets)
-6. [Deployment](#deployment)
+3. [Setup Requirements](#setup-requirements)
+4. [GitHub Actions Secrets](#github-actions-secrets)
+5. [Installation and Deployment](#installation-and-deployment)
+6. [Overview of Functionality](#overview-of-functionality)
 7. [Post-Deployment Steps](#post-deployment-steps)
-8. [Troubleshooting](#troubleshooting)
-9. [Contributing](#contributing)
-10. [License](#license)
+8. [Contributing](#contributing)
+9. [License](#license)
 
 ## Introduction
-This repository contains a Discord bot that leverages OpenAI's GPT-4, developed in Python and Flask. The bot is containerized using Docker and deployed on Azure Container Instances. This README guides you through setting up and deploying the project.
+This project features a Discord bot that leverages OpenAI's GPT-4 to process and generate content based on user inputs. Developed in Python with Flask, the bot integrates with Discord's bot framework and OpenAI's API to offer a unique interactive experience. It is designed for containerization with Docker and deployment on Azure Container Instances via GitHub Actions for CI/CD, utilizing Terraform for infrastructure management.
 
 ## Prerequisites
 - Python 3.11 or higher
-- Flask
-- Docker
-- Azure CLI
-- Terraform
+- Docker Desktop
+- An Azure subscription
 - GitHub account
+- An OpenAI API key
 
-## Azure Setup
-Follow the same steps as outlined previously to install the Azure CLI, sign in to your Azure account, create a resource group, and set up Azure Container Registry.
+## Setup Requirements
+Before deploying the bot, ensure you have:
+- Installed and logged in to the Azure CLI.
+- Configured Docker on your workstation.
+- Terraform installed for infrastructure provisioning.
+- Python 3.11 or higher, with Flask installed.
 
-## Terraform Setup
-No changes from the previous setup. Follow the original steps to install and initialize Terraform.
+## GitHub Actions Secrets
+To securely deploy and operate the bot, configure the following secrets in your GitHub repository:
+- `AZURE_TENANT_ID`: Your Azure account tenant ID.
+- `AZURE_CLIENT_ID`: The client ID of your Azure service principal.
+- `AZURE_CLIENT_SECRET`: The secret associated with the Azure service principal.
+- `AZURE_REGISTRY_USERNAME`: The username for your Azure Container Registry.
+- `AZURE_REGISTRY_PASSWORD`: The password for your Azure Container Registry.
+- `OPENAI_API_KEY`: Your OpenAI API key for GPT-4 access.
+- `DISCORD_TOKEN`: The token for your Discord bot.
+- `ASSISTANT_PENELOPE`: ID for Penelope, an assistant configured in your OpenAI application.
+- `ASSISTANT_MARIECAISSIE`: ID for Marie Caissie, another assistant in your OpenAI app.
+- `DEBUG_MODE`: Set to `True` for detailed logs.
 
-## GitHub Actions and Secrets
-Ensure the following secrets are configured in your GitHub repository:
-- AZURE_TENANT_ID
-- AZURE_CLIENT_ID
-- AZURE_CLIENT_SECRET
-- AZURE_REGISTRY_USERNAME
-- AZURE_REGISTRY_PASSWORD
-- OPENAI_API_KEY
-- DISCORD_TOKEN
+## Installation and Deployment
+1. **Azure and Terraform Setup**: Follow the Azure CLI and Terraform documentation to set up your infrastructure as per `postengineers.tf`.
+2. **Local Testing**: Ensure `app.py` functions correctly locally by setting environment variables for the OpenAI API key, Discord token, and assistant IDs.
+3. **GitHub Actions Configuration**: In your GitHub repo, adjust `.github/workflows/main.yml` for CI/CD pipeline, which automates the Docker build and push to Azure Container Registry, followed by deployment to Azure Container Instances.
+4. **Deployment**: Trigger a deployment by pushing to the `main` branch. GitHub Actions will execute the defined jobs, deploying your application to Azure.
 
-Adjust any steps as necessary for Python and Flask specific configurations.
-
-## Deployment
-Deployment via GitHub Actions remains unchanged. Pushing to the 'main' branch triggers the CI/CD pipeline to build the Docker image and deploy it to Azure.
+## Overview of Functionality
+The bot, developed in `app.py`, integrates with Discord and OpenAI GPT-4 to process user commands. It utilizes two specialized assistants, Penelope and Marie Caissie, to generate engaging content based on the instructions embedded in the code. The content is fetched and presented within Discord, providing a seamless interaction experience. This innovative approach allows for dynamic content generation, offering a wide range of possibilities for user engagement.
 
 ## Post-Deployment Steps
-Use Azure CLI commands to verify the container instance is running and fetch logs if needed.
-
-## Troubleshooting
-Review Azure container logs and ensure all GitHub Actions Secrets are correctly set for the Python and Flask environment.
+- Verify the deployment through the Azure portal or CLI.
+- Use Discord to interact with your bot and ensure it's responding as expected.
+- Monitor logs and performance metrics within Azure and GitHub Actions for any issues.
 
 ## Contributing
-Contributions are welcome! Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for code conduct and pull request guidelines.
+We welcome contributions! Please see the project's contributing guidelines for how to propose changes.
 
 ## License
-This project is licensed under the GNU General Public License v3.0. Developed with assistance from OpenAI's GPT-4 and ChatGPT.
+This project is licensed under the GNU General Public License v3.0. It incorporates contributions from OpenAI's GPT-4 and the development efforts of the project team.

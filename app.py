@@ -10,6 +10,7 @@ from openai import OpenAI
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+assistant_id_p = os.getenv('ASSISTANT_PENELOPE')
 
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -28,7 +29,7 @@ intents.guilds = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Configure OpenAI Assistants
-assistant_id_p = "asst_YGdZxXXnndYvtA0mxUMrnllX"  # Penelope
+# assistant_id_p = "asst_YGdZxXXnndYvtA0mxUMrnllX"  # Penelope
 
 # Event Handlers
 @bot.event
@@ -55,12 +56,12 @@ async def post(ctx, message: str):
         run = client.beta.threads.runs.create(
             thread_id=varThread_id,
             assistant_id=assistant_id_p,
-            instructions="Please provide a detailed response."
+            instructions="Please provide a detailed response. Always include emojis and you must always follow your preconfigured instructions."
         )
         while run.status in ['queued', 'in_progress', 'cancelling']:
             time.sleep(1)
             intCount += 1
-            reply_text = "Penelope has been thinking for " + str(intCount) + " seconds."
+            # reply_text = "Penelope has been thinking for " + str(intCount) + " seconds." # Uncomment only if you need to debug the while loop
             await ctx.followup.send(reply_text)
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
         if run.status == 'completed':

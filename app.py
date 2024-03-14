@@ -50,7 +50,7 @@ async def post(ctx, message: str):
         logger.debug(f"finished client.beta.threads.create")
         logger.debug(f"begin populating variable varThread_id")
         varThread_id = thread_response['data']['id']
-        logger.debug(f"this is the thread id: {varThread_id}")
+        logger.debug(f"this is the thread id: varThread_id")
         client.beta.threads.messages.create(
             thread_id=varThread_id,
             role="user",

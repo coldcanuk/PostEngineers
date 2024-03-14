@@ -75,19 +75,19 @@ async def handle_post_command(message, assistant_id, instructions):
             intCount += 1
             logger.debug(f"We are at iteration: {intCount}")
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
-        if run.status == 'completed':
-            listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-            logger.debug(f"Total messages received: {len(listMessages.data)}")
-            for index, msg in enumerate(listMessages.data):
-              role = msg.get('role')
-              # Assuming 'text' is a key in 'content' which is nested in each message and 'value' is the actual text content you're interested in
-              text_preview = msg.get('content', {}).get('text', {}).get('value', '')[:50]  # Just log the first 50 characters for a preview
-              logger.debug(f"Message {index + 1}: Role={role}, Text Preview='{text_preview}'")
-            # Extracting and logging just before the return
-            reply_texts = [msg.content['text']['value'] for msg in listMessages.data if msg.role == 'assistant' and 'text' in msg.content and 'value' in msg.content['text']]
-            logger.debug(f"Preparing to return reply_texts. Total texts: {len(reply_texts)} | Content: {reply_texts}")
-            #return [msg.content for msg in listMessages.data if msg.role == 'assistant']
-            return reply_texts
+            if run.status == 'completed':
+              logger.debug(f"Run.status has matched completed")
+              listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
+              reply_texts = []
+              logger.debug(f"BEGIN for loop")
+              for msg in listMessages.data:
+                if msg['role'] == 'assistant':
+                  for content_item in msg['content']:
+                    if content_item['type'] == 'text':
+                      text_value = content_item['text']['value']
+                      reply_texts.append(text_value)
+              logger.debug(f"Preparing to return reply_texts. Total texts: {len(reply_texts)} | Content: {reply_texts}")
+              return reply_texts
     except Exception as e:
         logger.error(f"Error in handle_post_command: {e}")
         return []

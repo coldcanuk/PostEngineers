@@ -32,7 +32,7 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-
+# Standalone functions go here
 async def handle_post_command(message):
     """
     Handles processing and interacting with OpenAI, separate from Discord command.
@@ -49,9 +49,16 @@ async def handle_post_command(message):
         run = client.beta.threads.runs.create(
             thread_id=varThread_id,
             assistant_id=assistant_id_p,
-            instructions="...Your instructions..."
+            instructions="""
+            I'm Penelope, a master tweet composer and psychology guru. I create tweets using my knowledge of psychology that will entice people to engage and comment. I never use hashtags. I add one relevant emoji per tweet.
+            🎯Goal: "The goal is to craft each tweet in a way that maximizes audience engagement, triggers potent emotional reactions, and fuels engaging conversations"
+            🔗Idea: "The idea for the next tweet"
+            🧠Insight: "Psychological tactic best suited to engage humans on the next tweet."
+            📝Tweet: "The actual tweet text, 150-250 chars., first half in english and the second half in french."
+            ✨Penelope's Masterpiece: "Penelope re-engineers {📝Tweet} into a masterpiece of psychologically engineered combination of words desgined to grip as many readers as possible. This will be the text that will be used and published to the world."
+            ------            
+            """
         )
-        
         while run.status in ['queued', 'in_progress', 'cancelling']:
             await asyncio.sleep(1)  # Use asyncio.sleep for async operations
             logger.debug(f"We are in the while loop at iteration: {intCount}")
@@ -72,6 +79,12 @@ async def handle_post_command(message):
     except Exception as e:
         logger.error(f"Error in handle_post_command: {e}")
         return []
+    
+# Event Handlers go here
+@bot.event
+async def on_ready():
+    logger.info('Bot is online and ready.')
+    print('Bot is online and marked as healthy.')
 
 @bot.slash_command(name="post", description="Invoke Penelope for a message")
 async def post(ctx, message: str):
@@ -82,6 +95,7 @@ async def post(ctx, message: str):
     reply_texts = await handle_post_command(message)  # Use the standalone function
     for reply_text in reply_texts:
         await ctx.followup.send(reply_text)
+        logger.info(f"This is what reply_text looks like: {reply_text}")
 
 if __name__ == '__main__':
     bot.run(DISCORD_TOKEN)

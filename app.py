@@ -38,10 +38,11 @@ async def post(ctx, message: str):
     try:
         # Step 2 Create a thread
         thread = client.beta.threads.create()
-        logger.debug(f"the thread ID is {thread['id']}")
+        thread_id=thread['id']
+        logger.debug(f"the thread ID is {thread_id} ")
         # Step 3 Add a message to the thread
         message_response = client.beta.threads.messages.create(
-            thread_id=thread['id'],
+            thread_id=thread_id,
             role="user",
             content=message  # Correct way to pass the message
         )

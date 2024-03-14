@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 from flask import Flask
 from discord.ext import commands
 import discord
@@ -26,6 +27,10 @@ intents.messages = True
 intents.guilds = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+# Configure OpenAI Assistants
+assistant_id_p="asst_YGdZxXXnndYvtA0mxUMrnllX" # Penelope
+
+# Event Handlers
 @bot.event
 async def on_ready():
     logger.info('Bot is online and ready.')
@@ -34,21 +39,47 @@ async def on_ready():
 @bot.slash_command(name="post", description="Invoke Penelope for a message")
 async def post(ctx, message: str):
     logger.debug(f"Received post command with text: {message}")
+    intCount = 0
     await ctx.defer()
     try:
-        # Correctly engaging Penelope with threading
-        thread_response = client.beta.threads.create()
-        thread_id = thread_response['data']['id']
-
-        message_response = client.beta.threads.create_message(thread_id=thread_id, 
-                                                         assistant_id="asst_YGdZxXXnndYvtA0mxUMrnllX", 
-                                                         input={"type": "text", "data": message})
-        
-        # Streamlining for clarity; real implementation may require more intricate handling
+        # Send a pondering message back to the user
         reply_text = "Penelope is pondering your request..."
-        
         logger.debug(f"Penelope's response: {reply_text}")
         await ctx.followup.send(reply_text)
+        # Correctly engaging Penelope with threading
+        # Create a thread
+        thread_response = client.beta.threads.create()
+        varThread_id = thread_response['data']['id']
+        new_message = client.beta.threads.messages.create(
+            thread_id=varThread_id,
+            role="user",
+            content=message
+            )
+        # Create a Run
+        run = client.beta.threads.runs.create(
+            thread_id=varThread_id,
+            assistant_id=assistant_id_p,
+            #instructions=""
+            )
+        # Runs are asynchornous, which means you'll want to monitor their status by polling the Run object for a terminal status.
+        while run.status in ['queued', 'in_progress', 'cancelling']:
+            time.sleep(1) # Wait for 1 second
+            reply_text = "Penelope has been thinking for " + str(intCount) + " seconds"
+            await ctx.followup.send(reply_text)
+            run = client.beta.threads.runs.retrieve(
+                thread_id=varThread_id,
+                run_id=run.id
+            )
+        # Once the Run completes, you can list the Messages added to the Thread by the Assistant.
+        if run.status == 'completed': 
+          listMessages = client.beta.threads.messages.list(
+          thread_id=varThread_id
+          )
+          await ctx.followup.send(listMessages)
+        else:
+          runStatus = run.status
+          logger.debug(f'Run Status: {runStatus}')
+        
     except Exception as e:
         logger.error(f'Error: {e}')
         await ctx.followup.send('Something went wrong.')

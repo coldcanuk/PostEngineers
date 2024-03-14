@@ -26,6 +26,7 @@ log_level = "DEBUG" if DEBUG_MODE else "INFO"
 logger.remove()  # Removes all handlers
 logger.add(sys.stdout, level=log_level)  # Re-add with the desired level
 logger.info(f"DEBUG_MODE: {DEBUG_MODE}")
+logger.debug(f"Confirming debug is on and detected")
 
 app = Flask(__name__)
 
@@ -34,7 +35,7 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-
+logger.debug(f"Configuring the instructions for the assistants")
 # Configure the instructions for the assistants
 penelope_instructions="""
   I'm Penelope, a master tweet composer and psychology guru. I create tweets using my knowledge of psychology that will entice people to engage and comment. I never use hashtags. I add one relevant emoji per tweet.
@@ -55,8 +56,9 @@ Je m'appelle Marie Caissie et je suis une cajunne French from Louisiana. I am yo
 🌳Complete Prompt: "The actual image prompt. So detailed leaving no room for interpretation"
 --
 """
-
+logger.debug(f"next line is the async def handle_post_command")
 async def handle_post_command(message, assistant_id, instructions):
+    logger.debug(f"BEGIN handle_post_function")
     intCount = 0
     try:
         thread_response = client.beta.threads.create()
@@ -77,8 +79,10 @@ async def handle_post_command(message, assistant_id, instructions):
     except Exception as e:
         logger.error(f"Error in handle_post_command: {e}")
         return []
+    logger.debug(f"END handle_post_command")
 
 async def extract_insight_and_masterpiece(texts):
+    logger.debug(f"BEGIN extract_insight_and_masterpiece")
     insight = ""
     masterpiece = ""
     for text in texts:
@@ -88,7 +92,9 @@ async def extract_insight_and_masterpiece(texts):
         masterpiece_match = re.search("Penelope's Masterpiece: (.+)", text)
         if masterpiece_match:
             masterpiece = masterpiece_match.group(1)
+    logger.debug(f"END extract_insight_and_masterpiece")
     return insight, masterpiece
+    
 
 @bot.event
 async def on_ready():

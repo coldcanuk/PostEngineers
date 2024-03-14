@@ -16,7 +16,7 @@ assistant_id_p = str(ASSISTANT_PENELOPE)
 client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
 DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't')
-log_level = "DEBUG" if DEBUG_MODE else "INFO"
+log_level = "INFO" if DEBUG_MODE else "DEBUG"
 logger.add(sys.stdout, level=log_level)
 logger.debug(assistant_id_p)
 app = Flask(__name__)

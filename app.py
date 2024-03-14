@@ -83,12 +83,12 @@ async def handle_post_command(message, assistant_id, instructions):
 
                 reply_texts = []
                 for msg in listMessages.data:
-                  if msg.role == 'assistant':  # Ensuring only messages from the assistant are processed
-                    for content in msg.content:
-                      if content.type == 'text':  # Check if the content block is of type 'text'
-                        text_value = content.text.value  # Access the text value
+                  if msg['role'] == 'assistant':
+                    for content in msg['content']:
+                      if content['type'] == 'text':
+                        text_value = content['text']['value']
                         reply_texts.append(text_value)
-                        logger.debug(f"Text value: {text_value[:50]}")  # Log the first 50 characters for preview
+                        logger.debug(f"Text value: {text_value[:50]}")  # For preview
 
                 logger.debug(f"Preparing to return reply_texts. Total texts: {len(reply_texts)} | Content: {reply_texts[:3]}")  # Log preview of up to 3 texts
                 return reply_texts

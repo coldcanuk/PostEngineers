@@ -45,7 +45,7 @@ async def post(ctx, message: str):
         reply_text = "Penelope is pondering your request..."
         logger.debug(f"Penelope's response: {reply_text}")
         await ctx.followup.send(reply_text)
-        
+        logger.debug(f"begin client.beta.threads.create")
         thread_response = client.beta.threads.create()
         varThread_id = thread_response['data']['id']
         logger.debug(f"this is the thread id: {varThread_id}")

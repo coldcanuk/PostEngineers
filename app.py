@@ -101,7 +101,7 @@ async def post(ctx, message: str):
         await ctx.followup.send(reply_text)  # Sending Penelope's full reply to Discord
     
     # Extract Insight and Masterpiece for Marie Caissie
-    insight, masterpiece = extract_insight_and_masterpiece(reply_texts)
+    insight, masterpiece = await extract_insight_and_masterpiece(reply_texts)
     combined_text = f"Insight: {insight} | Masterpiece: {masterpiece}"
     # This combined_text is ready to be sent to Marie Caissie for further processing.
     # Example: await handle_post_command(combined_text, assistant_id_mc, mariecaissie_instructions)

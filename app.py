@@ -15,19 +15,18 @@ assistant_id_p = str(ASSISTANT_PENELOPE)
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
-DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't')
-log_level = "INFO" if DEBUG_MODE else "DEBUG"
+DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't', 'on')
+log_level = "DEBUG" if DEBUG_MODE else "INFO"
 logger.add(sys.stdout, level=log_level)
 logger.debug(assistant_id_p)
 app = Flask(__name__)
-
 # Configure Discord
 intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Configure OpenAI Assistants
+# Configure OpenAI Assistants - uncomment if you need to statically set for debug purposes
 # assistant_id_p = "asst_YGdZxXXnndYvtA0mxUMrnllX"  # Penelope
 
 # Event Handlers

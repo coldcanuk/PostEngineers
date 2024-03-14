@@ -19,8 +19,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't')
 log_level = "DEBUG" if DEBUG_MODE else "INFO"
 logger.add(sys.stdout, level=log_level)
-logger.info(ASSISTANT_PENELOPE)
-logger.info(assistant_id_p)
+logger.debug(assistant_id_p)
 app = Flask(__name__)
 
 # Configure Discord
@@ -57,13 +56,22 @@ async def post(ctx, message: str):
         run = client.beta.threads.runs.create(
             thread_id=varThread_id,
             assistant_id=assistant_id_p,
-            instructions="Please provide a detailed response. Always include emojis and you must always follow your preconfigured instructions."
+            #instructions="Please provide a detailed response. Always include emojis and you must always follow your preconfigured instructions."
+            instructions="""
+            I'm Penelope, a master tweet composer and psychology guru. I create tweets using my knowledge of psychology that will entice people to engage and comment. I never use hashtags. I add one relevant emoji per tweet.
+            🎯Goal: "The goal is to craft each tweet in a way that maximizes audience engagement, triggers potent emotional reactions, and fuels engaging conversations"
+            🔗Idea: "The idea for the next tweet"
+            🧠Insight: "Psychological tactic best suited to engage humans on the next tweet."
+            📝Tweet: "The actual tweet text, 150-250 chars., first half in english and the second half in french."
+            ✨Penelope's Masterpiece: "Penelope re-engineers {📝Tweet} into a masterpiece of psychologically engineered combination of words desgined to grip as many readers as possible. This will be the text that will be used and published to the world."
+            ------
+            """
         )
         while run.status in ['queued', 'in_progress', 'cancelling']:
             time.sleep(1)
             intCount += 1
             # reply_text = "Penelope has been thinking for " + str(intCount) + " seconds." # Uncomment only if you need to debug the while loop
-            await ctx.followup.send(reply_text)
+            # await ctx.followup.send(reply_text)
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
         if run.status == 'completed':
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)

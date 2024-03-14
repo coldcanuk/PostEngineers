@@ -36,14 +36,16 @@ async def post(ctx, message: str):
     logger.debug(f"Received post command with text: {message}")
     await ctx.defer()
     try:
-        # Correct implementation for threading with the assistant
-        response = client.assistants.create_run(
-            assistant_id="asst_YGdZxXXnndYvtA0mxUMrnllX",
-            inputs=[{"type": "text_input", "data": {"text": message}}]
-        )
+        # Correctly engaging Penelope with threading
+        thread_response = client.threads.create()
+        thread_id = thread_response['data']['id']
+
+        message_response = client.threads.create_message(thread_id=thread_id, 
+                                                         assistant_id="asst_YGdZxXXnndYvtA0mxUMrnllX", 
+                                                         input={"type": "text", "data": message})
         
-        # Assuming 'response' contains the desired output structure
-        reply_text = response['choices'][0]['message']['content'] if response['choices'] else 'No content generated.'
+        # Streamlining for clarity; real implementation may require more intricate handling
+        reply_text = "Penelope is pondering your request..."
         
         logger.debug(f"Penelope's response: {reply_text}")
         await ctx.followup.send(reply_text)

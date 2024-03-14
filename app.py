@@ -69,13 +69,18 @@ async def handle_post_command(message, assistant_id, instructions):
             assistant_id=assistant_id,
             instructions=instructions
         )
+        logger.debug(f"BEGIN the while loop run.status")
         while run.status in ['queued', 'in_progress', 'cancelling']:
             await asyncio.sleep(1)
             intCount += 1
             run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
         if run.status == 'completed':
             listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-            return [msg.content for msg in listMessages.data if msg.role == 'assistant']
+            # Extracting and logging just before the return
+            reply_texts = [msg.content['text']['value'] for msg in listMessages.data if msg.role == 'assistant' and 'text' in msg.content and 'value' in msg.content['text']]
+            logger.debug(f"Preparing to return reply_texts. Total texts: {len(reply_texts)} | Content: {reply_texts}")
+            #return [msg.content for msg in listMessages.data if msg.role == 'assistant']
+            return reply_texts
     except Exception as e:
         logger.error(f"Error in handle_post_command: {e}")
         return []
@@ -105,11 +110,11 @@ async def post(ctx, message: str):
     await ctx.defer()
     reply_texts = await handle_post_command(message, assistant_id_p, penelope_instructions)
     for reply_text in reply_texts:
-        await ctx.followup.send(reply_text)  # Sending Penelope's full reply to Discord
+        await ctx.followup.send(reply_text)  # Sends the direct 'value' content
     
     # Extract Insight and Masterpiece for Marie Caissie
     insight, masterpiece = await extract_insight_and_masterpiece(reply_texts)
-    combined_text = f"Insight: {insight} | Masterpiece: {masterpiece}"
+    combined_text = f"My dearest Marie Caissie. I require your talents. It is with the greatest urgency that I need your artistic brilliance to compose for us a useable image prompt intended for use with an AI image generator. I thought long and hard about this and here is the insight I used Insight: {insight} TO DEVELOP my masterpiece Post Masterpiece: {masterpiece}"
     # This combined_text is ready to be sent to Marie Caissie for further processing.
     # Example: await handle_post_command(combined_text, assistant_id_mc, mariecaissie_instructions)
     # For demonstration purposes, we'll log it.

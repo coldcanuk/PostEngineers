@@ -45,40 +45,36 @@ async def post(ctx, message: str):
         reply_text = "Penelope is pondering your request..."
         logger.debug(f"Penelope's response: {reply_text}")
         await ctx.followup.send(reply_text)
-        logger.debug(f"begin client.beta.threads.create")
+        logger.debug("begin client.beta.threads.create")
         thread_response = client.beta.threads.create()
-        logger.debug(f"finished client.beta.threads.create")
-        logger.debug(f"begin populating variable for the thread id")
-        varThread_id = thread_response['data']['id']
-        logger.debug(f"finished populating the variable for the thread id")
+        logger.debug("finished client.beta.threads.create")
+        
+        # Adjusted to correctly extract thread ID from the response object
+        logger.debug("begin populating variable for the thread id")
+        varThread_id = thread_response.id  # Adjust this based on the actual attribute/method
+        logger.debug(f"Thread ID: {varThread_id}")
+
         client.beta.threads.messages.create(
             thread_id=varThread_id,
             role="user",
             content=message
         )
-        logger.debug(f"finished creating threads.messages")
-        logger.debug(f"creating threads.runs")
+        
         run = client.beta.threads.runs.create(
             thread_id=varThread_id,
             assistant_id=assistant_id_p,
             instructions="Please provide a detailed response."
         )
-        logger.debug(f"finished creating threads.runs, begin while loop")
+        
         while run.status in ['queued', 'in_progress', 'cancelling']:
             time.sleep(1)
-            intCount += 1  
+            intCount += 1
             reply_text = "Penelope has been thinking for " + str(intCount) + " seconds."
             await ctx.followup.send(reply_text)
-            run = client.beta.threads.runs.retrieve(
-                thread_id=varThread_id,
-                run_id=run.id
-            )
-        logger.debug(f"finished while loop, begin condition check")
+            run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
+
         if run.status == 'completed':
-            listMessages = client.beta.threads.messages.list(
-                thread_id=varThread_id
-            )
-            # Extract and send only the assistant's messages as a response
+            listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
             assistant_messages = [msg for msg in listMessages['data'] if msg['role'] == 'assistant']
             for msg in assistant_messages:
                 await ctx.followup.send(msg['content'])

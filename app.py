@@ -87,7 +87,7 @@ async def handle_post_command(message, assistant_id, instructions):
                       if content.type == 'text':
                         text_value = content.text.value
                         reply_texts.append(text_value)
-                logger.debug(f"END the for msg in listMessages.data loop")
+                #logger.debug(f"END the for msg in listMessages.data loop")
                 return reply_texts
               except Exception as e:
                 logger.error(f"Error in handle_post_command: {e}")

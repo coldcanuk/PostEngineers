@@ -90,9 +90,9 @@ async def handle_post_command(message, assistant_id, instructions):
                       if content.type == 'text':
                         text_value = content.text.value
                         reply_texts.append(text_value)
-                        logger.debug(f"Text value: {text_value[:50]}")  # For preview
+                        logger.debug(f"The reply texts while we are still in the for msg loop : {reply_texts}")  # For preview
 
-                logger.debug(f"Preparing to return reply_texts. Total texts: {len(reply_texts)} | Content: {reply_texts[:3]}")  # Log preview of up to 3 texts
+                logger.debug(f"END the for msg in listMessages.data loop")
                 return reply_texts
               except Exception as e:
                 logger.error(f"Error in handle_post_command: {e}")

@@ -79,8 +79,6 @@ async def handle_post_command(message, assistant_id, instructions):
               logger.debug(f"Run.status has matched completed")
               try:
                 listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-                #print(listMessages.data)
-                logger.debug(f"Begin the next FOR loop to iterate through listMessages.data")
                 # This part is giving us trouble and we need to keep an eye on it.
                 reply_texts = []
                 for msg in listMessages.data:

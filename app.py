@@ -79,7 +79,7 @@ async def handle_post_command(message, assistant_id, instructions):
               logger.debug(f"Run.status has matched completed")
               try:
                 listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-                logger.debug(f"Total messages received : {len(listMessages.data)}")
+                logger.debug(f"Total messages received : {len(listMessages)}")
                 #print(listMessages.data)
                 logger.debug(f"listMessages object type  {type(listMessages)}")
                 # This part is giving us trouble and we need to keep an eye on it.

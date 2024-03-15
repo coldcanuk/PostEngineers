@@ -113,7 +113,7 @@ async def extract_insight_and_masterpiece(texts):
         insight_match = re.search("Insight: (.+)", text)
         if insight_match:
             insight = insight_match.group(1)
-        masterpiece_match = re.search("Penelope's Masterpiece: (.+)", text)
+        masterpiece_match = re.search("Penelope\'s Masterpiece: (.+)", text)
         if masterpiece_match:
             masterpiece = masterpiece_match.group(1)
     logger.debug(f"END extract_insight_and_masterpiece")
@@ -133,6 +133,7 @@ async def post(ctx, message: str):
     logger.debug(f"Extract Insight and Masterpiece for Marie Caissie")
     # Extract Insight and Masterpiece for Marie Caissie
     insight, masterpiece = await extract_insight_and_masterpiece(reply_texts)
+    logger.debug(f"setting combined_text")
     combined_text = f"My dearest Marie Caissie. I require your talents. It is with the greatest urgency that I need your artistic brilliance to compose for us a useable image prompt intended for use with an AI image generator. I thought long and hard about this and here is the insight I used Insight: {insight} TO DEVELOP my masterpiece Post Masterpiece: {masterpiece}"
     # This combined_text is ready to be sent to Marie Caissie for further processing.
     # Example: await handle_post_command(combined_text, assistant_id_mc, mariecaissie_instructions)

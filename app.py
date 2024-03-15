@@ -43,7 +43,7 @@ penelope_instructions="""
   🔗Idea: "The idea for the next tweet"
   🧠Insight: "Psychological tactic best suited to engage humans on the next tweet."
   📝Tweet: "The actual tweet text, 150-250 chars., first half in english and the second half in french."
-  ✨Penelope's Masterpiece: "Penelope re-engineers {📝Tweet} into a masterpiece of psychologically engineered combination of words desgined to grip as many readers as possible. This will be the text that will be used and published to the world."
+  ✨Masterpiece: "Penelope re-engineers {📝Tweet} into a masterpiece of psychologically engineered combination of words desgined to grip as many readers as possible. This will be the text that will be used and published to the world."
   ------            
   """
 mariecaissie_instructions = """
@@ -79,21 +79,16 @@ async def handle_post_command(message, assistant_id, instructions):
               logger.debug(f"Run.status has matched completed")
               try:
                 listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-                logger.debug(f"Total messages received : {len(listMessages)}")
                 #print(listMessages.data)
-                logger.debug(f"listMessages object type  {type(listMessages)}")
+                logger.debug(f"Begin the next FOR loop to iterate through listMessages.data")
                 # This part is giving us trouble and we need to keep an eye on it.
                 reply_texts = []
                 for msg in listMessages.data:
                   if msg.role == 'assistant':
-                    #logger.debug(f"msg.role is equal to assistant")
                     for content in msg.content:
                       if content.type == 'text':
-                        #logger.debug(f"content.type is equal to text")
                         text_value = content.text.value
                         reply_texts.append(text_value)
-                        #logger.debug(f"The reply texts while we are still in the for msg loop : {str(text_value)}")  # For preview
-
                 logger.debug(f"END the for msg in listMessages.data loop")
                 return reply_texts
               except Exception as e:
@@ -115,7 +110,7 @@ async def extract_insight_and_masterpiece(texts):
         insight_match = re.search("Insight: (.+)", text)
         if insight_match:
             insight = insight_match.group(1)
-        masterpiece_match = re.search("Penelope\'s Masterpiece: (.+)", text)
+        masterpiece_match = re.search("Masterpiece: (.+)", text)
         if masterpiece_match:
             masterpiece = masterpiece_match.group(1)
     logger.debug(f"END extract_insight_and_masterpiece")
@@ -130,11 +125,12 @@ async def on_ready():
 async def post(ctx, message: str):
     await ctx.defer()
     reply_texts = await handle_post_command(message, assistant_id_p, penelope_instructions)
+    intCount2 = 0
     for reply_text in reply_texts:
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
-    logger.debug(f"Extract Insight and Masterpiece for Marie Caissie")
-    # Extract Insight and Masterpiece for Marie Caissie
-    insight, masterpiece = await extract_insight_and_masterpiece(reply_texts)
+        insight, masterpiece = await extract_insight_and_masterpiece(reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
+        logger.debug(f"Reply iteration: {intCount2} ")
+        intCount2 = intCount2 + 1
     logger.debug(f"setting combined_text")
     combined_text = f"My dearest Marie Caissie. I require your talents. It is with the greatest urgency that I need your artistic brilliance to compose for us a useable image prompt intended for use with an AI image generator. I thought long and hard about this and here is the insight I used Insight: {insight} TO DEVELOP my masterpiece Post Masterpiece: {masterpiece}"
     # This combined_text is ready to be sent to Marie Caissie for further processing.

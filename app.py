@@ -92,7 +92,7 @@ async def handle_post_command(message, assistant_id, instructions):
                         logger.debug(f"content.type is equal to text")
                         text_value = content.text.value
                         reply_texts.append(text_value)
-                        logger.debug(f"The reply texts while we are still in the for msg loop : {str(text_value)}")  # For preview
+                        #logger.debug(f"The reply texts while we are still in the for msg loop : {str(text_value)}")  # For preview
 
                 logger.debug(f"END the for msg in listMessages.data loop")
                 return reply_texts

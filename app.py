@@ -125,9 +125,9 @@ async def post(ctx, message: str):
     reply_texts = await handle_post_command(message, assistant_id_p, penelope_instructions)
     intCount2 = 0
     for reply_text in reply_texts:
+        logger.debug(f"Reply iteration: {intCount2} ")
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
         insight, masterpiece = await extract_insight_and_masterpiece(reply_text) # Sends the direct 'value' content to be parse for Marie Caissie
-        logger.debug(f"Reply iteration: {intCount2} ")
         intCount2 = intCount2 + 1
     logger.debug(f"setting combined_text")
     insight, masterpiece = await extract_insight_and_masterpiece(reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie

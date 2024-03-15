@@ -86,8 +86,10 @@ async def handle_post_command(message, assistant_id, instructions):
                 reply_texts = []
                 for msg in listMessages.data:
                   if msg.role == 'assistant':
+                    logger.debug(f"msg.role is equal to assistant")
                     for content in msg.content:
                       if content.type == 'text':
+                        logger.debug(f"content.type is equal to text")
                         text_value = content.text.value
                         reply_texts.append(text_value)
                         logger.debug(f"The reply texts while we are still in the for msg loop : {reply_texts}")  # For preview

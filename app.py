@@ -82,14 +82,13 @@ async def handle_post_command(message, assistant_id, instructions):
                 logger.debug(f"Total messages received : {len(listMessages.data)}")
                 #print(listMessages.data)
                 logger.debug(f"listMessages object type  {type(listMessages)}")
-                logger.debug(f"Print listMessages.data : {print(listMessages.data)}")
                 # This part is giving us trouble and we need to keep an eye on it.
                 reply_texts = []
                 for msg in listMessages.data:
                   if msg.role == 'assistant':
                     for content in msg.content:
-                      if content['type'] == 'text':
-                        text_value = content['text']['value']
+                      if content.type == 'text':
+                        text_value = content.text.value
                         reply_texts.append(text_value)
                         logger.debug(f"Text value: {text_value[:50]}")  # For preview
 

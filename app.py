@@ -82,7 +82,7 @@ async def handle_post_command(message, assistant_id, instructions):
                 logger.debug(f"Total messages received: {len(listMessages.data)}")
                 #print(listMessages.data)
                 logger.debug(f"listMessages object type: {type(listMessages)}")
-                logger.debug(f"listMessages data: {(listMessages.data)}")
+                logger.debug(f"listMessages data: {(listMessages.data[0])}")
                 # This part is giving us trouble and we need to keep an eye on it.
                 reply_texts = []
                 for msg in listMessages.data:

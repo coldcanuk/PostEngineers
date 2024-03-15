@@ -130,7 +130,7 @@ async def post(ctx, message: str):
     reply_texts = await handle_post_command(message, assistant_id_p, penelope_instructions)
     for reply_text in reply_texts:
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
-    
+    logger.debug(f"Extract Insight and Masterpiece for Marie Caissie")
     # Extract Insight and Masterpiece for Marie Caissie
     insight, masterpiece = await extract_insight_and_masterpiece(reply_texts)
     combined_text = f"My dearest Marie Caissie. I require your talents. It is with the greatest urgency that I need your artistic brilliance to compose for us a useable image prompt intended for use with an AI image generator. I thought long and hard about this and here is the insight I used Insight: {insight} TO DEVELOP my masterpiece Post Masterpiece: {masterpiece}"

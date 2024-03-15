@@ -107,9 +107,11 @@ async def handle_post_command(message, assistant_id, instructions):
 
 async def extract_insight_and_masterpiece(texts):
     logger.debug(f"BEGIN extract_insight_and_masterpiece")
+    print("Debugging texts:", texts)  # Temporarily added for debugging
     insight = ""
     masterpiece = ""
     for text in texts:
+        print("Processing text:", text)  # Temporarily added for debugging
         insight_match = re.search("Insight: (.+)", text)
         if insight_match:
             insight = insight_match.group(1)

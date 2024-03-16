@@ -122,12 +122,12 @@ async def on_ready():
 async def post(ctx, message: str):
     await ctx.defer()
     reply_texts = await handle_post_command(message, assistant_id_p, penelope_instructions)
-    foo
+    foo = []
     intCount2 = 0
     for reply_text in reply_texts:
         #logger.debug(f"Reply iteration: {intCount2} ")
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
-        foo += reply_text
+        foo.append(reply_text)
         #intCount2 = intCount2 + 1
     logger.debug(f"sent text to Discord. Now setting combined_text as the user prompt for Marie Caissie")
     #insight, masterpiece = extract_insight_and_masterpiece(reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie

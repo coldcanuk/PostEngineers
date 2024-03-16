@@ -128,7 +128,7 @@ async def post(ctx, message: str):
         #logger.debug(f"Reply iteration: {intCount2} ")
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
         foo.append(reply_text)
-        logger.debug(f"{foo}")
+        print(foo)
         #intCount2 = intCount2 + 1
     
     logger.debug(f"sent text to Discord. Now setting combined_text as the user prompt for Marie Caissie")

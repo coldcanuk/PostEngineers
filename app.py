@@ -136,8 +136,8 @@ async def post(ctx, message: str):
     insight = "DEBUG SET"
     masterpiece = "DEBUG SET"
     combined_text = "I am DEBUG combined_text"
-    print(foo)
-    print(reply_texts)
+    #print(foo)
+    #print(reply_texts)
     #insight, masterpiece = extract_insight_and_masterpiece(reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
     logger.info(f"{len(insight)}")
     logger.info(f"{len(masterpiece)}")

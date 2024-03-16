@@ -135,7 +135,7 @@ async def post(ctx, message: str):
     combined_text = f"DEBUG DEBUG DEBUG"
     print(f"reply_text's type is: {type(reply_texts)}")
     print(f"foo's type is: type{type(foo)}")
-    print(f"printing the string of reply_texts: {str(reply_texts)}")
+    print(f"printing the string of reply_texts: {reply_texts}")
     # This combined_text is ready to be sent to Marie Caissie for further processing.
     # Example: await handle_post_command(combined_text, assistant_id_mc, mariecaissie_instructions)
     # For demonstration purposes, we'll log it.

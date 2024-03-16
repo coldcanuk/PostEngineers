@@ -132,9 +132,10 @@ async def post(ctx, message: str):
     logger.debug(f"sent text to Discord. Now setting combined_text as the user prompt for Marie Caissie")
     #insight, masterpiece = extract_insight_and_masterpiece(reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
     #combined_text = f"My dearest Marie Caissie. I require your talents. It is with the greatest urgency that I need your artistic brilliance to compose for us a useable image prompt intended for use with an AI image generator. I thought long and hard about this and here is the insight I used Insight: {insight} TO DEVELOP my masterpiece Post Masterpiece: {masterpiece}"
-    combined_text = f"DEBUG DEBUG this is foo: {type(foo)}"
+    combined_text = f"DEBUG DEBUG DEBUG"
     print(f"reply_text's type is: {type(reply_texts)}")
     print(f"foo's type is: type{type(foo)}")
+    print(f"printing the string of reply_texts: {str(reply_texts)}")
     # This combined_text is ready to be sent to Marie Caissie for further processing.
     # Example: await handle_post_command(combined_text, assistant_id_mc, mariecaissie_instructions)
     # For demonstration purposes, we'll log it.

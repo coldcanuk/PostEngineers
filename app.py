@@ -7,6 +7,7 @@ from discord.ext import commands
 import discord
 from loguru import logger
 from openai import OpenAI
+import json
 
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -122,27 +123,53 @@ async def on_ready():
 async def post(ctx, message: str):
     await ctx.defer()
     reply_texts = await handle_post_command(message, assistant_id_p, penelope_instructions)
-    foo = []
+    debug_object_reply = []
     intCount2 = 0
     for reply_text in reply_texts:
         #logger.debug(f"Reply iteration: {intCount2} ")
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
-        foo.append(reply_text)
+        debug_object_reply.append(reply_text)
         #print(foo)
         #intCount2 = intCount2 + 1
     
     logger.debug(f"sent text to Discord. Now setting combined_text as the user prompt for Marie Caissie")
     logger.debug(f"reply_text's type is: {type(reply_texts)}")
-    logger.debug(f"foo's type is: type{type(foo)}")
-    insight = "DEBUG SET"
-    masterpiece = "DEBUG SET"
-    combined_text = "I am DEBUG combined_text"
+    logger.debug(f"foo's type is: type{type(debug_object_reply)}")
+    logger.info(f"Creating our custom object")
+    replyLines = debug_object_reply.strip().split('\n')
+    data_dict = {}
+    for line in replyLines:
+      # Assuming each line starts with an emoji followed by the key name and the text
+      key, value = line.split(':', 1)
+      # Removing the leading emoji and trimming whitespace for the key
+      key = key.strip()[1:].strip()
+      # Trimming whitespace for the value
+      value = value.strip()
+      data_dict[key] = value
+
+    # Serializing the dictionary to a JSON formatted string
+    penelope_reply_data = json.dumps(data_dict, indent=4, ensure_ascii=False)
+    print f"{penelope_reply_data}"
+    # Setting up insigth and masterpiece with debug data. Everything is working if this is overwritten. We will use this later for error checking and data integrity things
+    insight = "Insight: 1 DEBUG SET"
+    masterpiece = "Masterpiece: 2 DEBUG SET"
+    combined_text = "I am DEBUG combined_text of" + insight + "and the " + masterpiece
     
     #print(foo)
     #print(reply_texts)
-    #insight, masterpiece = extract_insight_and_masterpiece(reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
+    
+    debug_reply_texts = """
+      🎯Goal: To evoke nostalgia and a sense of connection, making people reminisce about personal moments they've had on a bench, prompting them to share their stories.
+      🔗Idea: Connect the image of a simple bench to profound life moments — first loves, deep conversations, quiet solitude — to highlight its role as a silent witness to human emotions and stories.
+      🧠Insight: Utilizing the phenomenon of "nostalgia marketing," where evoking memories can create a stronger emotional bond with the audience. This method increases engagement by appealing not just to the mind but to the heart, triggering a more profound, reflective interaction.
+      📝Tweet: "Ever noticed how a bench is more than just a place to sit? It's where stories unfold and memories are made. Chaque banc détient les secrets d’amour, de rire, et de moments de réflexion. 🍂"
+      ✨Masterpiece: "In every wood grain and paint chip, a bench whispers tales of heartbeats shared and solitude embraced. It's not just wood and nails; it's a memoir of humanity. Chaque banc raconte une histoire, écoutez-la et partagez la vôtre. Un silent narrateur d’émotions authentiques. 🍂"
+    """
+    
+    insight, masterpiece = extract_insight_and_masterpiece(debug_reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
     logger.info(f"{len(insight)}")
     logger.info(f"{len(masterpiece)}")
+
     #combined_text = f"My dearest Marie Caissie. I require your talents. It is with the greatest urgency that I need your artistic brilliance to compose for us a useable image prompt intended for use with an AI image generator. I thought long and hard about this and here is the insight I used Insight: {insight} TO DEVELOP my masterpiece Post Masterpiece: {masterpiece}"
     #logger.debug(f"the value of insight is: {insight}")
     #logger.debug(f"the value of masterpiece is: {masterpiece}")

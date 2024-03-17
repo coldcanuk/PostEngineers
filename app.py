@@ -136,12 +136,9 @@ async def post(ctx, message: str):
     logger.debug(f"reply_text's type is: {type(reply_texts)}")
     logger.debug(f"foo's type is: type{type(debug_object_reply)}")
     logger.info(f"Creating our custom object")
-    replyLines = debug_object_reply.strip().split('\n')
-    replyOne = []
-    for each in replyLines:
-        replyOne.append(each.strip().split('\n'))
+
     data_dict = {}
-    for line in replyOne:
+    for line in debug_object_reply:
       # Assuming each line starts with an emoji followed by the key name and the text
       key, value = line.split(':', 1)
       # Removing the leading emoji and trimming whitespace for the key
@@ -156,6 +153,9 @@ async def post(ctx, message: str):
     # Setting up insigth and masterpiece with debug data. Everything is working if this is overwritten. We will use this later for error checking and data integrity things
     insight = "Insight: 1 DEBUG SET"
     masterpiece = "Masterpiece: 2 DEBUG SET"
+    insight = data_dict.get('Insight', 'Default Insight')
+    masterpiece = data_dict.get('Masterpiece', 'Default Masterpiece')
+
     combined_text = "I am DEBUG combined_text of" + insight + "and the " + masterpiece
     
     #print(foo)

@@ -57,6 +57,15 @@ Je m'appelle Marie Caissie et je suis une cajunne French from Louisiana. I am yo
 🌳Complete Prompt: "The actual image prompt. So detailed leaving no room for interpretation"
 --
 """
+# DEBUG
+debug_reply_texts = """
+  🎯Goal: To evoke nostalgia and a sense of connection, making people reminisce about personal moments they've had on a bench, prompting them to share their stories.
+  🔗Idea: Connect the image of a simple bench to profound life moments — first loves, deep conversations, quiet solitude — to highlight its role as a silent witness to human emotions and stories.
+  🧠Insight: Utilizing the phenomenon of "nostalgia marketing," where evoking memories can create a stronger emotional bond with the audience. This method increases engagement by appealing not just to the mind but to the heart, triggering a more profound, reflective interaction.
+  📝Tweet: "Ever noticed how a bench is more than just a place to sit? It's where stories unfold and memories are made. Chaque banc détient les secrets d’amour, de rire, et de moments de réflexion. 🍂"
+  ✨Masterpiece: "In every wood grain and paint chip, a bench whispers tales of heartbeats shared and solitude embraced. It's not just wood and nails; it's a memoir of humanity. Chaque banc raconte une histoire, écoutez-la et partagez la vôtre. Un silent narrateur d’émotions authentiques. 🍂"
+  """
+  
 logger.debug(f"next line is the async def handle_post_command")
 async def handle_post_command(message, assistant_id, instructions):
     logger.debug(f"BEGIN handle_post_function")
@@ -130,15 +139,19 @@ async def post(ctx, message: str):
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
         debug_object_reply.append(reply_text)
         logger.debug(f" reply_text had something and we appended it to debug_object_reply")
-        #print(foo)
-        #intCount2 = intCount2 + 1
-    
     logger.debug(f"sent text to Discord. Now setting combined_text as the user prompt for Marie Caissie")
     logger.debug(f"reply_text's type is: {type(reply_texts)}")
     logger.debug(f"foo's type is: type{type(debug_object_reply)}")
     logger.info(f"Creating our custom object")
-'''
-    data_dict = {}
+    insight = "Insight: 1 DEBUG SET"
+    masterpiece = "Masterpiece: 2 DEBUG SET"
+    combined_text = "I am DEBUG combined_text of" + insight + "and the " + masterpiece
+    logger.info(f"{len(insight)}")
+    logger.info(f"{len(masterpiece)}")
+    insight, masterpiece = extract_insight_and_masterpiece(combined_text) # Sends the direct 'value' content to be parse for Marie Caissie
+    
+  
+    '''data_dict = {}
     for line in debug_object_reply:
       # Assuming each line starts with an emoji followed by the key name and the text
       key, value = line.split(':', 1)
@@ -146,34 +159,25 @@ async def post(ctx, message: str):
       key = key.strip()[1:].strip()
       # Trimming whitespace for the value
       value = value.strip()
-      data_dict[key] = value
-'''
+      data_dict[key] = value'''
     # Serializing the dictionary to a JSON formatted string
     #penelope_reply_data = json.dumps(data_dict, indent=4, ensure_ascii=False)
     #print (penelope_reply_data)
     # Setting up insigth and masterpiece with debug data. Everything is working if this is overwritten. We will use this later for error checking and data integrity things
-    insight = "Insight: 1 DEBUG SET"
-    masterpiece = "Masterpiece: 2 DEBUG SET"
+
     #insight = data_dict.get('Insight', 'Default Insight')
     #masterpiece = data_dict.get('Masterpiece', 'Default Masterpiece')
 
-    combined_text = "I am DEBUG combined_text of" + insight + "and the " + masterpiece
+
     
     #print(foo)
     #print(reply_texts)
     
-    debug_reply_texts = """
-      🎯Goal: To evoke nostalgia and a sense of connection, making people reminisce about personal moments they've had on a bench, prompting them to share their stories.
-      🔗Idea: Connect the image of a simple bench to profound life moments — first loves, deep conversations, quiet solitude — to highlight its role as a silent witness to human emotions and stories.
-      🧠Insight: Utilizing the phenomenon of "nostalgia marketing," where evoking memories can create a stronger emotional bond with the audience. This method increases engagement by appealing not just to the mind but to the heart, triggering a more profound, reflective interaction.
-      📝Tweet: "Ever noticed how a bench is more than just a place to sit? It's where stories unfold and memories are made. Chaque banc détient les secrets d’amour, de rire, et de moments de réflexion. 🍂"
-      ✨Masterpiece: "In every wood grain and paint chip, a bench whispers tales of heartbeats shared and solitude embraced. It's not just wood and nails; it's a memoir of humanity. Chaque banc raconte une histoire, écoutez-la et partagez la vôtre. Un silent narrateur d’émotions authentiques. 🍂"
-    """
-    
-    insight, masterpiece = extract_insight_and_masterpiece(debug_reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
-    logger.info(f"{len(insight)}")
-    logger.info(f"{len(masterpiece)}")
 
+    
+
+
+#
     #combined_text = f"My dearest Marie Caissie. I require your talents. It is with the greatest urgency that I need your artistic brilliance to compose for us a useable image prompt intended for use with an AI image generator. I thought long and hard about this and here is the insight I used Insight: {insight} TO DEVELOP my masterpiece Post Masterpiece: {masterpiece}"
     #logger.debug(f"the value of insight is: {insight}")
     #logger.debug(f"the value of masterpiece is: {masterpiece}")
@@ -182,7 +186,7 @@ async def post(ctx, message: str):
     # Example: await handle_post_command(combined_text, assistant_id_mc, mariecaissie_instructions)
     # For demonstration purposes, we'll log it.
     #print("Debug reply_text content: ", reply_texts)
-    logger.info(f"Prepared for Marie Caissie, the output of combined_text is: {combined_text}")
+logger.info(f"Prepared for Marie Caissie, the output of combined_text is: {combined_text}")
 
 if __name__ == '__main__':
     bot.run(DISCORD_TOKEN)

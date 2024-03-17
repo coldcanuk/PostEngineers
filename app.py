@@ -134,8 +134,6 @@ async def post(ctx, message: str):
     logger.debug(f"sent text to Discord. Now setting combined_text as the user prompt for Marie Caissie")
     logger.debug(f"reply_text's type is: {type(reply_texts)}")
     logger.debug(f"foo's type is: type{type(foo)}")
-    for bar in foo:
-      print(bar)
     insight = "DEBUG SET"
     masterpiece = "DEBUG SET"
     combined_text = "I am DEBUG combined_text"

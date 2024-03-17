@@ -137,7 +137,7 @@ async def post(ctx, message: str):
     logger.debug(f"reply_text's type is: {type(reply_texts)}")
     logger.debug(f"foo's type is: type{type(debug_object_reply)}")
     logger.info(f"Creating our custom object")
-
+'''
     data_dict = {}
     for line in debug_object_reply:
       # Assuming each line starts with an emoji followed by the key name and the text
@@ -147,7 +147,7 @@ async def post(ctx, message: str):
       # Trimming whitespace for the value
       value = value.strip()
       data_dict[key] = value
-
+'''
     # Serializing the dictionary to a JSON formatted string
     #penelope_reply_data = json.dumps(data_dict, indent=4, ensure_ascii=False)
     #print (penelope_reply_data)

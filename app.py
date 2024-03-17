@@ -128,9 +128,8 @@ async def post(ctx, message: str):
     for reply_text in reply_texts:
         #logger.debug(f"Reply iteration: {intCount2} ")
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
-        if (reply_text):
-          debug_object_reply.append(reply_text)
-          logger.debug(f" reply_text had something and we appended it to debug_object_reply")
+        debug_object_reply.append(reply_text)
+        logger.debug(f" reply_text had something and we appended it to debug_object_reply")
         #print(foo)
         #intCount2 = intCount2 + 1
     
@@ -150,13 +149,13 @@ async def post(ctx, message: str):
       data_dict[key] = value
 
     # Serializing the dictionary to a JSON formatted string
-    penelope_reply_data = json.dumps(data_dict, indent=4, ensure_ascii=False)
-    print (penelope_reply_data)
+    #penelope_reply_data = json.dumps(data_dict, indent=4, ensure_ascii=False)
+    #print (penelope_reply_data)
     # Setting up insigth and masterpiece with debug data. Everything is working if this is overwritten. We will use this later for error checking and data integrity things
     insight = "Insight: 1 DEBUG SET"
     masterpiece = "Masterpiece: 2 DEBUG SET"
-    insight = data_dict.get('Insight', 'Default Insight')
-    masterpiece = data_dict.get('Masterpiece', 'Default Masterpiece')
+    #insight = data_dict.get('Insight', 'Default Insight')
+    #masterpiece = data_dict.get('Masterpiece', 'Default Masterpiece')
 
     combined_text = "I am DEBUG combined_text of" + insight + "and the " + masterpiece
     
@@ -183,7 +182,7 @@ async def post(ctx, message: str):
     # Example: await handle_post_command(combined_text, assistant_id_mc, mariecaissie_instructions)
     # For demonstration purposes, we'll log it.
     #print("Debug reply_text content: ", reply_texts)
-    logger.info(f"Prepared for Marie Caissie: {combined_text}")
+    logger.info(f"Prepared for Marie Caissie, the output of combined_text is: {combined_text}")
 
 if __name__ == '__main__':
     bot.run(DISCORD_TOKEN)

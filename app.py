@@ -128,7 +128,7 @@ async def post(ctx, message: str):
     for reply_text in reply_texts:
         #logger.debug(f"Reply iteration: {intCount2} ")
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
-        debug_object_reply.append(reply_text)
+        await debug_object_reply.append(reply_text)
         #print(foo)
         #intCount2 = intCount2 + 1
     

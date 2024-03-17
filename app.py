@@ -148,6 +148,7 @@ async def post(ctx, message: str):
     combined_text = "I am DEBUG combined_text of" + insight + "and the " + masterpiece
     logger.info(f"{len(insight)}")
     logger.info(f"{len(masterpiece)}")
+    logger.info(f"Prepared for Marie Caissie, the output of combined_text is: {combined_text}")
     insight, masterpiece = extract_insight_and_masterpiece(combined_text) # Sends the direct 'value' content to be parse for Marie Caissie
     
   
@@ -186,7 +187,6 @@ async def post(ctx, message: str):
     # Example: await handle_post_command(combined_text, assistant_id_mc, mariecaissie_instructions)
     # For demonstration purposes, we'll log it.
     #print("Debug reply_text content: ", reply_texts)
-logger.info(f"Prepared for Marie Caissie, the output of combined_text is: {combined_text}")
 
 if __name__ == '__main__':
     bot.run(DISCORD_TOKEN)

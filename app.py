@@ -140,20 +140,21 @@ async def post(ctx, message: str):
         debug_object_reply = debug_object_reply + reply_text
         logger.debug(f" reply_text had something and we appended it to debug_object_reply")
     logger.debug(f"sent text to Discord. Now setting combined_text as the user prompt for Marie Caissie")
-    logger.debug(f"reply_text's type is: {type(reply_texts)}")
-    logger.debug(f"debug_object_reply's type is: type{type(debug_object_reply)}")
     logger.info(f"Creating our custom object")
     insight = "Insight: 1 DEBUG SET"
     masterpiece = "Masterpiece: 2 DEBUG SET"
     logger.info(f"Insight's length is: {len(insight)}")
     logger.info(f"Masterpiece's length is: {len(masterpiece)}")
-    combined_text = "I am DEBUG combined_text of" + insight + " and the " + masterpiece
+    combined_text = "I am DEBUG combined_text of" + insight + " and the " + masterpiece + "   "
     logger.info(f"Prepared for Marie Caissie, the output of combined_text is: {combined_text}")
+    logger.debug(f"reply_text's type is: {type(reply_texts)}")
+    logger.debug(f"debug_object_reply's type is: {type(debug_object_reply)}")
     logger.debug(f"debug_reply_texts length is: {len(debug_reply_texts)}")
     logger.debug(f"reply_texts length is: {len(reply_texts)}")
+    logger.debug(f"debug_object_reply length is: {len(debug_object_reply)}")
     logger.debug(f"-----------------------------")
     #logger.debug(f"debug_object_reply: {str(debug_object_reply)}")
-    print(debug_object_reply)
+    #print(debug_object_reply)
     #insight, masterpiece = extract_insight_and_masterpiece(debug_reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
     logger.info(f"new Insight's length is: {len(insight)}")
     logger.info(f"new Masterpiece's length is: {len(masterpiece)}")

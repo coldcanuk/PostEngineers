@@ -153,7 +153,8 @@ async def post(ctx, message: str):
     logger.debug(f"reply_texts length is: {len(reply_texts)}")
     logger.debug(f"debug_object_reply length is: {len(debug_object_reply)}")
     logger.debug(f"-----------------------------")
-    data_dict = {}
+    
+    '''data_dict = {}
     for line in debug_object_reply:
       # Assuming each line starts with an emoji followed by the key name and the text
       key, value = line.split(':', 1)
@@ -161,14 +162,14 @@ async def post(ctx, message: str):
       key = key.strip()[1:].strip()
       # Trimming whitespace for the value
       value = value.strip()
-      data_dict[key] = value
+      data_dict[key] = value'''
 
     # Serializing the dictionary to a JSON formatted string
-    penelope_reply_data = json.dumps(data_dict, indent=4, ensure_ascii=False)
+    #penelope_reply_data = json.dumps(data_dict, indent=4, ensure_ascii=False)
     #print (penelope_reply_data)
     
-    insight = data_dict.get('Insight', 'Default Insight')
-    masterpiece = data_dict.get('Masterpiece', 'Default Masterpiece')
+    #insight = data_dict.get('Insight', 'Default Insight')
+    #masterpiece = data_dict.get('Masterpiece', 'Default Masterpiece')
 
 
         
@@ -177,7 +178,7 @@ async def post(ctx, message: str):
     #
     #logger.debug(f"debug_object_reply: {str(debug_object_reply)}")
     #print(debug_object_reply)
-    #insight, masterpiece = extract_insight_and_masterpiece(debug_reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
+    insight, masterpiece = extract_insight_and_masterpiece(debug_reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
     logger.info(f"new Insight's length is: {len(insight)}")
     logger.info(f"new Masterpiece's length is: {len(masterpiece)}")
   

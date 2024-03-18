@@ -153,7 +153,13 @@ async def post(ctx, message: str):
     logger.debug(f"reply_texts length is: {len(reply_texts)}")
     logger.debug(f"debug_object_reply length is: {len(debug_object_reply)}")
     logger.debug(f"-----------------------------")
-    print(f"{debug_object_reply}")
+    intCount2 = 0
+    for line in debug_object_reply:
+      print (f"We are at iteration: {intCount2}")
+      print(line)
+      intCount2 = intCount2 + 1
+    #
+    # print(f"{debug_object_reply}")
     #
     #logger.debug(f"debug_object_reply: {str(debug_object_reply)}")
     #print(debug_object_reply)

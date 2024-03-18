@@ -150,7 +150,7 @@ async def post(ctx, message: str):
     combined_text = "I am DEBUG combined_text of" + insight + " and the " + masterpiece
     logger.info(f"Prepared for Marie Caissie, the output of combined_text is: {combined_text}")
     logger.debug(f"debug_reply_texts length is: {len(debug_reply_texts)}")
-    logger.debug(f"debug_reply_texts with dot data: {(debug_reply_texts).data}")
+    logger.debug(f"reply_text's dot data: {(reply_texts).data}")
     logger.debug(f"-----------------------------")
     insight, masterpiece = extract_insight_and_masterpiece(combined_text) # Sends the direct 'value' content to be parse for Marie Caissie
     logger.info(f"new Insight's length is: {len(insight)}")

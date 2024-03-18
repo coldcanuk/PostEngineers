@@ -132,12 +132,12 @@ async def on_ready():
 async def post(ctx, message: str):
     await ctx.defer()
     reply_texts = await handle_post_command(message, assistant_id_p, penelope_instructions)
-    debug_object_reply = []
+    debug_object_reply = ""
     intCount2 = 0
     for reply_text in reply_texts:
         #logger.debug(f"Reply iteration: {intCount2} ")
         await ctx.followup.send(reply_text)  # Sends the direct 'value' content
-        debug_object_reply.append(reply_text)
+        debug_object_reply = debug_object_reply + reply_text
         logger.debug(f" reply_text had something and we appended it to debug_object_reply")
     logger.debug(f"sent text to Discord. Now setting combined_text as the user prompt for Marie Caissie")
     logger.debug(f"reply_text's type is: {type(reply_texts)}")
@@ -150,7 +150,7 @@ async def post(ctx, message: str):
     combined_text = "I am DEBUG combined_text of" + insight + " and the " + masterpiece
     logger.info(f"Prepared for Marie Caissie, the output of combined_text is: {combined_text}")
     logger.debug(f"debug_reply_texts length is: {len(debug_reply_texts)}")
-    logger.debug(f"reply_text's stuff: {(reply_texts)}")
+    logger.debug(f"reply_texts length is: {len(reply_texts)}")
     logger.debug(f"-----------------------------")
     insight, masterpiece = extract_insight_and_masterpiece(combined_text) # Sends the direct 'value' content to be parse for Marie Caissie
     logger.info(f"new Insight's length is: {len(insight)}")

@@ -153,7 +153,7 @@ async def post(ctx, message: str):
     logger.debug(f"reply_texts length is: {len(reply_texts)}")
     logger.debug(f"debug_object_reply length is: {len(debug_object_reply)}")
     logger.debug(f"-----------------------------")
-    
+    print(debug_object_reply)
     '''data_dict = {}
     for line in debug_object_reply:
       # Assuming each line starts with an emoji followed by the key name and the text

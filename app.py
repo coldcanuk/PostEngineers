@@ -153,8 +153,8 @@ async def post(ctx, message: str):
     logger.debug(f"reply_texts length is: {len(reply_texts)}")
     logger.debug(f"debug_object_reply length is: {len(debug_object_reply)}")
     logger.debug(f"-----------------------------")
-    print(debug_object_reply)
-    '''data_dict = {}
+    
+    data_dict = {}
     for line in debug_object_reply:
       # Assuming each line starts with an emoji followed by the key name and the text
       key, value = line.split(':', 1)
@@ -162,11 +162,11 @@ async def post(ctx, message: str):
       key = key.strip()[1:].strip()
       # Trimming whitespace for the value
       value = value.strip()
-      data_dict[key] = value'''
+      data_dict[key] = value
 
     # Serializing the dictionary to a JSON formatted string
-    #penelope_reply_data = json.dumps(data_dict, indent=4, ensure_ascii=False)
-    #print (penelope_reply_data)
+    penelope_reply_data = json.dumps(data_dict, indent=4, ensure_ascii=False)
+    print (penelope_reply_data)
     
     #insight = data_dict.get('Insight', 'Default Insight')
     #masterpiece = data_dict.get('Masterpiece', 'Default Masterpiece')

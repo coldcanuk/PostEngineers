@@ -178,7 +178,7 @@ async def post(ctx, message: str):
     #
     #logger.debug(f"debug_object_reply: {str(debug_object_reply)}")
     #print(debug_object_reply)
-    insight, masterpiece = extract_insight_and_masterpiece(debug_reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
+    #insight, masterpiece = extract_insight_and_masterpiece(debug_reply_texts) # Sends the direct 'value' content to be parse for Marie Caissie
     logger.info(f"new Insight's length is: {len(insight)}")
     logger.info(f"new Masterpiece's length is: {len(masterpiece)}")
   

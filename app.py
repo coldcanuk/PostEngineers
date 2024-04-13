@@ -67,32 +67,32 @@ debug_reply_texts = """
 async def handle_post_command(message, assistant_id, instructions):
     logger.debug("BEGIN handle_post_function")
     try:
-        # Step 1: Create a thread
         thread_response = client.beta.threads.create()
         varThread_id = thread_response.id
         logger.debug(f"Thread created with ID: {varThread_id}")
 
-        # Step 2: Post a user message to the thread
-        client.beta.threads.messages.create(thread_id=varThread_id, role="user", content=message)
-        await asyncio.sleep(2)  # Brief pause to ensure the thread updates
+        post_response = client.beta.threads.messages.create(thread_id=varThread_id, role="user", content=message)
+        logger.debug(f"Message posted to thread: {post_response}")
 
-        # Retrieve messages from the thread
+        # Here we introduce a pause, a breath for the oracle to ponder our query
+        await asyncio.sleep(5)  # Adjust as needed based on operational observations
+
         listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
         logger.debug(f"Retrieving messages for thread ID: {varThread_id}")
 
-        # Filter for assistant's messages
+        # Now, we seek the assistant's messages, filtering through the digital chorus for our muse's voice
         reply_texts = [msg.content for msg in listMessages.data if msg.role == 'assistant']
+
+        if reply_texts:
+            logger.debug(f"Retrieved messages: {reply_texts}")
+        else:
+            logger.warning("No replies found. The muse remains silent.")
         
-        logger.debug(f"Retrieved messages: {reply_texts}")
         return reply_texts
 
     except Exception as e:
         logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
-
-
-
-
 
 
 def extract_insight_and_masterpiece(texts):

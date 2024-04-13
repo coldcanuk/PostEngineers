@@ -63,36 +63,36 @@ debug_reply_texts = """
   📝Tweet: "Ever noticed how a bench is more than just a place to sit? It's where stories unfold and memories are made. Chaque banc détient les secrets d’amour, de rire, et de moments de réflexion. 🍂"
   ✨Masterpiece: "In every wood grain and paint chip, a bench whispers tales of heartbeats shared and solitude embraced. It's not just wood and nails; it's a memoir of humanity. Chaque banc raconte une histoire, écoutez-la et partagez la vôtre. Un silent narrateur d’émotions authentiques. 🍂"
   """
-
-async def handle_post_command(message, assistant_id, instructions):
+  
+async def handle_post_command(message, assistant_id):
     logger.debug("BEGIN handle_post_function")
     try:
-        thread_response = client.beta.threads.create()
-        varThread_id = thread_response.id
-        logger.debug(f"Thread created with ID: {varThread_id}")
+        # Initiating a thread and run with the assistant in one action
+        run = client.beta.threads.create_and_run(
+            assistant_id=assistant_id,
+            thread={
+                "messages": [
+                    {"role": "user", "content": message}
+                ]
+            }
+        )
 
-        post_response = client.beta.threads.messages.create(thread_id=varThread_id, role="user", content=message)
-        logger.debug(f"Message posted to thread: {post_response}")
-
-        # Here we introduce a pause, a breath for the oracle to ponder our query
-        await asyncio.sleep(5)  # Adjust as needed based on operational observations
-
-        listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-        logger.debug(f"Retrieving messages for thread ID: {varThread_id}")
-
-        # Now, we seek the assistant's messages, filtering through the digital chorus for our muse's voice
-        reply_texts = [msg.content for msg in listMessages.data if msg.role == 'assistant']
-
-        if reply_texts:
+        logger.debug(f"Run initiated with assistant {assistant_id}, awaiting completion...")
+        
+        # Checking if we received a valid response
+        if run and 'data' in run and 'messages' in run['data']:
+            reply_texts = [msg['content'] for msg in run['data']['messages'] if msg['role'] == 'assistant']
             logger.debug(f"Retrieved messages: {reply_texts}")
         else:
             logger.warning("No replies found. The muse remains silent.")
-        
+            reply_texts = []
+
         return reply_texts
 
     except Exception as e:
         logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
+
 
 
 def extract_insight_and_masterpiece(texts):

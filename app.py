@@ -70,7 +70,7 @@ async def handle_post_command(message, assistant_id, instructions):
     try:
         # Step 1: Create a thread
         thread_response = client.beta.threads.create()
-        varThread_id = thread_response['data']['id']
+        varThread_id = thread_response.id
         logger.debug(f"Thread created with ID: {varThread_id}")
 
         # Step 2: Post a message to the thread

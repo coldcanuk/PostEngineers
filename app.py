@@ -98,7 +98,8 @@ async def handle_post_command(message, assistant_id):
                 if content_block.type == 'text'
         ]
         
-        logger.debug(f"Retrieved messages, reply_texts length: {len(reply_texts)}")
+        #logger.debug(f"Retrieved messages, reply_texts length: {len(reply_texts)}")
+        logger.debug("just before the return of reply_texts")
         return reply_texts
 
     except Exception as e:

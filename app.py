@@ -114,7 +114,7 @@ async def post(ctx, message: str):
 
     # Penelope's Process
     try:
-        reply_texts = await handle_post_command(message, assistant_id_p, penelope_instructions)
+        reply_texts = await handle_post_command(message, assistant_id_p)
         logger.debug("Received reply from Penelope: {}", reply_texts)
     except Exception as e:
         logger.error("Failed to retrieve reply from Penelope: {}", e)

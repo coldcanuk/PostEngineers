@@ -80,9 +80,12 @@ async def handle_post_command(message, assistant_id):
                 ]
             }
         )
-        run_id = run_response.data.id
+        varRun_id = run_response.data.id
         varThread_id = run_response.data.thread_id
-        logger.debug(f"Run initiated with assistant {assistant_id}, awaiting completion...")
+        logger.debug(f"Run initiated with assistant {assistant_id}")
+        logger.debug(f"The run ID is: {varRun_id}")
+        logger.debug(f"The thread ID is:{varThread_id}")
+        logger.debug("awaiting completion...")
         # The digital vigil begins
         intCount = 0
         logger.debug(f"The digit vigil begins at iteration count: {intCount}")
@@ -91,7 +94,7 @@ async def handle_post_command(message, assistant_id):
             await asyncio.sleep(1)
             intCount += 1
             logger.debug(f"We are at iteration: {intCount}")
-            run_response = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run_id)
+            run_response = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=varRun_id)
             if run_response.data.status == 'completed':
                 logger.debug("Run.status has matched completed")
                 break  # Exiting the loop as our quest for wisdom has reached fruition

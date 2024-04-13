@@ -76,31 +76,24 @@ async def handle_post_command(message, assistant_id):
                 ]
             }
         )
-        varRun_id = run_response.id
         varThread_id = run_response.thread_id
-        logger.debug(f"Run initiated with assistant {assistant_id}")
-        logger.debug(f"The Run ID is: {varRun_id}")
-        logger.debug(f"The Thread ID is: {varThread_id}")
-        logger.debug("Awaiting Completion .......")
-        # The digital vigil begins
+        logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {varThread_id}")
+
+        # Monitoring the run's status
         intCount = 0
-        logger.debug("BEGIN the while loop run.status")
-        while run_response.status in ['queued', 'in_progress', 'cancelling']:
+        while True:
             await asyncio.sleep(1)
             intCount += 1
-            logger.debug(f"We are at iteration: {intCount}")
-            run_response = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=varRun_id)
-            if run_response.status == 'completed':
+            logger.debug(f"Checking run status, iteration: {intCount}")
+            run_details = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run_response.id)
+            if run_details.status == 'completed':
                 logger.debug("Run.status has matched completed")
                 break  # Exiting the loop as our quest for wisdom has reached fruition
 
-        # Retrieving the fruits of our patience
-        if run_response.status == 'completed':
-            reply_texts = [msg.content for msg in run_response.messages if msg.role == 'assistant']
-            logger.debug(f"Retrieved messages: {reply_texts}")
-        else:
-            logger.warning("The muse remains silent or the query was lost in the cosmos.")
-            reply_texts = []
+        # Once the run is completed, fetch all messages from the thread
+        listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
+        reply_texts = [msg.content for msg in listMessages.data if msg.role == 'assistant']
+        logger.debug(f"Retrieved messages: {reply_texts}")
 
         return reply_texts
 

@@ -8,6 +8,7 @@ import discord
 from loguru import logger
 from openai import OpenAI
 import json
+import backoff
 
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -67,53 +68,50 @@ debug_reply_texts = """
 async def handle_post_command(message, assistant_id):
     logger.debug("BEGIN handle_post_function")
     try:
-        # Initiating a thread and run with the assistant in one action
-        run_response = client.beta.threads.create_and_run(
+        response = client.beta.threads.create_and_run(
             assistant_id=assistant_id,
-            thread={
-                "messages": [
-                    {"role": "user", "content": message}
-                ]
-            }
+            thread={"messages": [{"role": "user", "content": message}]}
         )
-        varThread_id = run_response.thread_id
+        
+        # Validate API response structure
+        if not all(k in response for k in ("id", "thread_id", "status")):
+            raise ValueError("Unexpected API response structure.")
+        
+        varThread_id = response.thread_id
         logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {varThread_id}")
 
-        # Monitoring the run's status
-        intCount = 0
-        while True:
-            logger.debug("------------------------")
-            logger.debug("Begin sleep")
-            await asyncio.sleep(2)
-            logger.debug("End sleep")
-            logger.debug("Counter increment")
-            intCount += 1
-            logger.debug("next is run_details")
-            run_details = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run_response.id)
-            logger.debug(f"Checking run status: {run_details.status}, iteration: {intCount}")
-            if run_details.status == 'completed':
-                logger.debug(f"Run.status has matched completed")
-                break  # Exiting the loop as our quest for wisdom has reached fruition
+        # Dynamic sleeping with exponential backoff
+        @backoff.on_predicate(backoff.expo, lambda x: x.status not in ['completed', 'failed'], max_time=120)
+        async def wait_for_completion(thread_id, run_id):
+            return client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
 
-        # Once the run is completed, fetch all messages from the thread
-        logger.debug(f"Once the run is completed, fetch all messages from the thread")
+        run_details = await wait_for_completion(varThread_id, response.id)
+        
+        if run_details.status != 'completed':
+            raise RuntimeError(f"Run did not complete successfully: {run_details.status}")
+
         listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-        print(listMessages.data)
-        reply_texts = []
-        #reply_texts = [msg.content for msg in listMessages.data if msg.role == 'assistant']
-        for msg in listMessages.data:
-          if msg.role == 'assistant':
-            for content_block in msg.content:
-              if content_block.type == 'text':
-                text_value = content_block.text.value
-                reply_texts.append(text_value)
+        
+        if "data" not in listMessages:
+            raise ValueError("Malformed response: missing 'data' in messages list.")
+        
+        reply_texts = [
+            content_block.text.value for msg in listMessages.data 
+            if msg.role == 'assistant' 
+            for content_block in msg.content 
+            if content_block.type == 'text'
+        ]
+        
         logger.debug(f"Retrieved messages: {reply_texts}")
-
         return reply_texts
 
     except Exception as e:
         logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
+
+
+
+
 
 
 def extract_insight_and_masterpiece(texts):
@@ -164,12 +162,16 @@ async def post(ctx, message: str):
     combined_text = f"My dearest Marie Caissie, I require your talents. It is with the greatest urgency that I need your artistic brilliance to compose for us a useable image prompt intended for use with an AI image generator. Here is the insight I used: {insight} to develop my masterpiece: {masterpiece}"
     logger.debug("Crafted combined_text for Marie Caissie: {}", combined_text)
 
-    # Marie Caissie's Process
+    # Attempt to invoke Marie Caissie with the crafted prompt
     try:
-        marie_reply_texts = await handle_post_command(combined_text, assistant_id_mc, mariecaissie_instructions)
-        logger.debug("Received reply from Marie Caissie: {}", marie_reply_texts)
+        marie_reply_texts = await handle_post_command(combined_text, assistant_id_mc)
+        if marie_reply_texts:
+            full_marie_reply = " ".join(marie_reply_texts)
+            await ctx.followup.send(full_marie_reply)
+        else:
+            raise Exception("Marie Caissie's response was empty.")
     except Exception as e:
-        logger.error("Failed to retrieve reply from Marie Caissie: {}", e)
+        logger.error(f"Encountered an issue invoking Marie Caissie: {e}")
         await ctx.followup.send("By the ancients! Marie Caissie's canvas remains blank.")
         return
 
@@ -178,8 +180,6 @@ async def post(ctx, message: str):
         await ctx.followup.send("Marie Caissie whispers of creative block. Please try again.")
         return
 
-    full_marie_reply = " ".join(marie_reply_texts)
-    await ctx.followup.send(full_marie_reply)
     logger.debug("Marie Caissie's creation now adorns the Discord channel. Our journey concludes.")
 
 if __name__ == '__main__':

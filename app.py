@@ -84,7 +84,9 @@ async def handle_post_command(message, assistant_id):
         while True:
             logger.debug("Begin sleep")
             await asyncio.sleep(2)
+            logger.debug("Counter increment")
             intCount += 1
+            logger.debug("next is run_details")
             run_details = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run_response.id)
             logger.debug(f"Checking run status: {run_details.status}, iteration: {intCount}")
             if run_details.status == 'completed':

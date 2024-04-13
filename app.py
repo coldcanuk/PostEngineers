@@ -94,11 +94,11 @@ async def handle_post_command(message, assistant_id):
         reply_texts = [
             content_block.text.value for msg in listMessages.data 
             if msg.role == 'assistant' 
-            for content_block in msg.content 
-            if content_block.type == 'text'
+              for content_block in msg.content 
+                if content_block.type == 'text'
         ]
         
-        logger.debug(f"Retrieved messages: {reply_texts}")
+        logger.debug(f"Retrieved messages, reply_texts length: {len(reply_texts)}")
         return reply_texts
 
     except Exception as e:

@@ -83,9 +83,9 @@ async def handle_post_command(message, assistant_id):
         run_id = run_response.data.id
         varThread_id = run_response.data.thread_id
         logger.debug(f"Run initiated with assistant {assistant_id}, awaiting completion...")
-
         # The digital vigil begins
         intCount = 0
+        logger.debug(f"The digit vigil begins at iteration count: {intCount}")
         logger.debug("BEGIN the while loop run.status")
         while run_response.data.status in ['queued', 'in_progress', 'cancelling']:
             await asyncio.sleep(1)

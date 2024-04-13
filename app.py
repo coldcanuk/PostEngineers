@@ -63,42 +63,37 @@ debug_reply_texts = """
   📝Tweet: "Ever noticed how a bench is more than just a place to sit? It's where stories unfold and memories are made. Chaque banc détient les secrets d’amour, de rire, et de moments de réflexion. 🍂"
   ✨Masterpiece: "In every wood grain and paint chip, a bench whispers tales of heartbeats shared and solitude embraced. It's not just wood and nails; it's a memoir of humanity. Chaque banc raconte une histoire, écoutez-la et partagez la vôtre. Un silent narrateur d’émotions authentiques. 🍂"
   """
-  
+
 async def handle_post_command(message, assistant_id, instructions):
     logger.debug("BEGIN handle_post_function")
-    intCount = 0
     try:
         # Step 1: Create a thread
         thread_response = client.beta.threads.create()
         varThread_id = thread_response.id
         logger.debug(f"Thread created with ID: {varThread_id}")
 
-        # Step 2: Post a message to the thread
+        # Step 2: Post a user message to the thread
         client.beta.threads.messages.create(thread_id=varThread_id, role="user", content=message)
+        await asyncio.sleep(2)  # Brief pause to ensure the thread updates
+
+        # Retrieve messages from the thread
+        listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
+        logger.debug(f"Retrieving messages for thread ID: {varThread_id}")
+
+        # Filter for assistant's messages
+        reply_texts = [msg.content for msg in listMessages.data if msg.role == 'assistant']
         
-        # Step 3: Create a run with instructions
-        run = client.beta.threads.create_run(thread_id=varThread_id, model=assistant_id, instructions=instructions)
-        logger.debug("Run initiated, awaiting completion...")
+        logger.debug(f"Retrieved messages: {reply_texts}")
+        return reply_texts
 
-        # Monitor the run's status and wait for completion
-        while run['data']['status'] in ['queued', 'in_progress']:
-            await asyncio.sleep(1)
-            intCount += 1
-            logger.debug(f"At iteration: {intCount}")
-            run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run['data']['id'])
-
-        if run['data']['status'] == 'completed':
-            logger.debug("Run completed. Fetching messages.")
-            
-            # Step 4: Retrieve messages from the thread
-            listMessages = client.threads.list_messages(thread_id=varThread_id)
-            reply_texts = [msg['content'] for msg in listMessages['data'] if msg['role'] == 'assistant']
-            
-            logger.debug(f"Retrieved messages: {reply_texts}")
-            return reply_texts
     except Exception as e:
         logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
+
+
+
+
+
 
 def extract_insight_and_masterpiece(texts):
     insight_match = re.search("🧠Insight: (.+)", texts)

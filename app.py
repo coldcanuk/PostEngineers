@@ -100,7 +100,7 @@ async def handle_post_command(message, assistant_id):
         listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
         logger.debug(f"listMessages: {listMessages}")
         reply_texts = [msg.content for msg in listMessages.data if msg.role == 'assistant']
-        logger.debug(f"Retrieved messages length: {str(reply_texts)}")
+        #logger.debug(f"Retrieved messages length: {str(reply_texts)}")
 
         return reply_texts
 

@@ -89,8 +89,8 @@ async def handle_post_command(message, assistant_id):
         listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
         
         if "data" not in listMessages:
-            raise ValueError("Malformed response: missing 'data' in messages list.")
-        
+            raise ValueError(f"Malformed response: missing 'data' in messages list.:  {listMessages}")
+            
         reply_texts = [
             content_block.text.value for msg in listMessages.data 
             if msg.role == 'assistant' 

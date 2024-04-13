@@ -99,8 +99,14 @@ async def handle_post_command(message, assistant_id):
         logger.debug(f"Once the run is completed, fetch all messages from the thread")
         listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
         print(listMessages.data)
-        reply_texts = "TEST"
+        reply_texts = []
         #reply_texts = [msg.content for msg in listMessages.data if msg.role == 'assistant']
+        for msg in listMessages.data:
+          if msg.role == 'assistant':
+            for content_block in msg.content:
+              if content_block.type == 'text':
+                text_value = content_block.text.value
+                reply_texts.append(text_value)
         logger.debug(f"Retrieved messages: {reply_texts}")
 
         return reply_texts

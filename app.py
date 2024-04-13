@@ -69,15 +69,15 @@ async def handle_post_command(message, assistant_id, instructions):
     intCount = 0
     try:
         # Step 1: Create a thread
-        thread_response = client.threads.create()
+        thread_response = client.beta.threads.create()
         varThread_id = thread_response['data']['id']
         logger.debug(f"Thread created with ID: {varThread_id}")
 
         # Step 2: Post a message to the thread
-        client.threads.add_message(thread_id=varThread_id, role="system", content=message)
+        client.beta.threads.messages.create(thread_id=varThread_id, role="user", content=message)
         
         # Step 3: Create a run with instructions
-        run = client.threads.create_run(thread_id=varThread_id, model=assistant_id, instructions=instructions)
+        run = client.beta.threads.create_run(thread_id=varThread_id, model=assistant_id, instructions=instructions)
         logger.debug("Run initiated, awaiting completion...")
 
         # Monitor the run's status and wait for completion
@@ -85,7 +85,7 @@ async def handle_post_command(message, assistant_id, instructions):
             await asyncio.sleep(1)
             intCount += 1
             logger.debug(f"At iteration: {intCount}")
-            run = client.threads.retrieve_run(thread_id=varThread_id, run_id=run['data']['id'])
+            run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run['data']['id'])
 
         if run['data']['status'] == 'completed':
             logger.debug("Run completed. Fetching messages.")

@@ -72,10 +72,7 @@ async def handle_post_command(message, assistant_id):
             assistant_id=assistant_id,
             thread={"messages": [{"role": "user", "content": message}]}
         )
-        # Validate response structure
-        if not isinstance(response, dict) or 'id' not in response or 'thread_id' not in response:
-            logger.error("Unexpected API response structure: {}", response)
-            return []
+
         varThread_id = response.thread_id
         logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {varThread_id}")
 

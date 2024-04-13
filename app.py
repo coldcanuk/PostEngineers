@@ -82,6 +82,7 @@ async def handle_post_command(message, assistant_id):
         # Monitoring the run's status
         intCount = 0
         while True:
+            logger.debug("Begin sleep")
             await asyncio.sleep(2)
             intCount += 1
             run_details = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run_response.id)
@@ -94,7 +95,7 @@ async def handle_post_command(message, assistant_id):
         logger.debug(f"Once the run is completed, fetch all messages from the thread")
         listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
         reply_texts = [msg.content for msg in listMessages.data if msg.role == 'assistant']
-        logger.debug(f"Retrieved messages: {reply_texts}")
+        logger.debug(f"Retrieved messages length: {len(reply_texts)}")
 
         return reply_texts
 

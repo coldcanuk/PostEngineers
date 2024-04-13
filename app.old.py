@@ -67,46 +67,50 @@ debug_reply_texts = """
   """
   
 logger.debug(f"next line is the async def handle_post_command")
-async def handle_post_command(message, assistant_id, instructions):
-    logger.debug(f"BEGIN handle_post_function")
-    intCount = 0
+
+async def handle_post_command(message, assistant_id):
+    logger.debug("BEGIN handle_post_function")
     try:
-        thread_response = client.beta.threads.create()
-        varThread_id = thread_response.id
-        client.beta.threads.messages.create(thread_id=varThread_id, role="user", content=message)
-        run = client.beta.threads.runs.create(
-            thread_id=varThread_id,
+        # Initiating a thread and run with the assistant in one action
+        run_response = client.beta.threads.create_and_run(
             assistant_id=assistant_id,
-            instructions=instructions
+            thread={
+                "messages": [
+                    {"role": "user", "content": message}
+                ]
+            }
         )
-        logger.debug(f"BEGIN the while loop run.status")
-        while run.status in ['queued', 'in_progress', 'cancelling']:
+        run_id = run_response.data.id
+        varThread_id = run_response.data.thread_id
+        logger.debug(f"Run initiated with assistant {assistant_id}, awaiting completion...")
+
+        # The digital vigil begins
+        intCount = 0
+        logger.debug("BEGIN the while loop run.status")
+        while run_response.data.status in ['queued', 'in_progress', 'cancelling']:
             await asyncio.sleep(1)
             intCount += 1
             logger.debug(f"We are at iteration: {intCount}")
-            run = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run.id)
-            if run.status == 'completed':
-              logger.debug(f"Run.status has matched completed")
-              try:
-                listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-                # This part is giving us trouble and we need to keep an eye on it.
-                reply_texts = []
-                for msg in listMessages.data:
-                  if msg.role == 'assistant':
-                    for content in msg.content:
-                      if content.type == 'text':
-                        text_value = content.text.value
-                        reply_texts.append(text_value)
-                logger.debug(f"END the for msg in listMessages.data loop, return the data")
-                return reply_texts
-              except Exception as e:
-                logger.error(f"Error in handle_post_command: {e}")
-                return []
-          
+            run_response = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=run_id)
+            if run_response.data.status == 'completed':
+                logger.debug("Run.status has matched completed")
+                break  # Exiting the loop as our quest for wisdom has reached fruition
+
+        # Retrieving the fruits of our patience
+        if run_response.data.status == 'completed':
+            reply_texts = [msg.content for msg in run_response.data.messages if msg.role == 'assistant']
+            logger.debug(f"Retrieved messages: {reply_texts}")
+        else:
+            logger.warning("The muse remains silent or the query was lost in the cosmos.")
+            reply_texts = []
+
+        return reply_texts
+
     except Exception as e:
-        logger.error(f"Error in handle_post_command: {e}")
+        logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
 
+# Extract Insight and Masterpiece from Penelope's reply and return them as insight, masterpiece
 def extract_insight_and_masterpiece(texts):
     logger.debug(f"BEGIN extract_insight_and_masterpiece")
     print("Debugging texts:", texts)  # Temporarily added for debugging

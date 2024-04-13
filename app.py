@@ -64,14 +64,40 @@ debug_reply_texts = """
   ✨Masterpiece: "In every wood grain and paint chip, a bench whispers tales of heartbeats shared and solitude embraced. It's not just wood and nails; it's a memoir of humanity. Chaque banc raconte une histoire, écoutez-la et partagez la vôtre. Un silent narrateur d’émotions authentiques. 🍂"
   """
   
-
 async def handle_post_command(message, assistant_id, instructions):
+    logger.debug("BEGIN handle_post_function")
+    intCount = 0
     try:
-        response = await client.create_completion(
-            engine=assistant_id, prompt=message + instructions, max_tokens=1000)
-        return response.choices[0].text.strip().split("\n")
+        # Step 1: Create a thread
+        thread_response = client.threads.create()
+        varThread_id = thread_response['data']['id']
+        logger.debug(f"Thread created with ID: {varThread_id}")
+
+        # Step 2: Post a message to the thread
+        client.threads.add_message(thread_id=varThread_id, role="system", content=message)
+        
+        # Step 3: Create a run with instructions
+        run = client.threads.create_run(thread_id=varThread_id, model=assistant_id, instructions=instructions)
+        logger.debug("Run initiated, awaiting completion...")
+
+        # Monitor the run's status and wait for completion
+        while run['data']['status'] in ['queued', 'in_progress']:
+            await asyncio.sleep(1)
+            intCount += 1
+            logger.debug(f"At iteration: {intCount}")
+            run = client.threads.retrieve_run(thread_id=varThread_id, run_id=run['data']['id'])
+
+        if run['data']['status'] == 'completed':
+            logger.debug("Run completed. Fetching messages.")
+            
+            # Step 4: Retrieve messages from the thread
+            listMessages = client.threads.list_messages(thread_id=varThread_id)
+            reply_texts = [msg['content'] for msg in listMessages['data'] if msg['role'] == 'assistant']
+            
+            logger.debug(f"Retrieved messages: {reply_texts}")
+            return reply_texts
     except Exception as e:
-        logger.error(f"Error in handle_post_command: {e}")
+        logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
 
 def extract_insight_and_masterpiece(texts):

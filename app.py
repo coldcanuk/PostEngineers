@@ -68,7 +68,7 @@ async def handle_post_command(message, assistant_id):
     logger.debug("BEGIN handle_post_function")
     try:
         # Initiating a thread and run with the assistant in one action
-        run = client.beta.threads.create_and_run(
+        run_response = client.beta.threads.create_and_run(
             assistant_id=assistant_id,
             thread={
                 "messages": [
@@ -76,15 +76,30 @@ async def handle_post_command(message, assistant_id):
                 ]
             }
         )
+        varRun_id = run_response.data.id
+        varThread_id = run_response.data.thread_id
+        logger.debug(f"Run initiated with assistant {assistant_id}")
+        logger.debug(f"The Run ID is: {varRun_id}")
+        logger.debug(f"The Thread ID is: {varThread_id}")
+        logger.debug("Awaiting Completion .......")
+        # The digital vigil begins
+        intCount = 0
+        logger.debug("BEGIN the while loop run.status")
+        while run_response.data.status in ['queued', 'in_progress', 'cancelling']:
+            await asyncio.sleep(1)
+            intCount += 1
+            logger.debug(f"We are at iteration: {intCount}")
+            run_response = client.beta.threads.runs.retrieve(thread_id=varThread_id, run_id=varRun_id)
+            if run_response.data.status == 'completed':
+                logger.debug("Run.status has matched completed")
+                break  # Exiting the loop as our quest for wisdom has reached fruition
 
-        logger.debug(f"Run initiated with assistant {assistant_id}, awaiting completion...")
-        
-        # Checking if we received a valid response
-        if run and 'data' in run and 'messages' in run['data']:
-            reply_texts = [msg['content'] for msg in run['data']['messages'] if msg['role'] == 'assistant']
+        # Retrieving the fruits of our patience
+        if run_response.data.status == 'completed':
+            reply_texts = [msg.content for msg in run_response.data.messages if msg.role == 'assistant']
             logger.debug(f"Retrieved messages: {reply_texts}")
         else:
-            logger.warning("No replies found. The muse remains silent.")
+            logger.warning("The muse remains silent or the query was lost in the cosmos.")
             reply_texts = []
 
         return reply_texts
@@ -92,7 +107,6 @@ async def handle_post_command(message, assistant_id):
     except Exception as e:
         logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
-
 
 
 def extract_insight_and_masterpiece(texts):

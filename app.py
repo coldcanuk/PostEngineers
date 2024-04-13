@@ -145,7 +145,7 @@ async def post(ctx, message: str):
     masterpiece = "Masterpiece: 2 DEBUG SET"
     logger.info(f"Insight's length is: {len(insight)}")
     logger.info(f"Masterpiece's length is: {len(masterpiece)}")
-    combined_text = "I am DEBUG combined_text of" + insight + " and the " + masterpiece + "   "
+    combined_text = "I am the DEBUG combined_text of " + insight + " and the " + masterpiece + "   "
     logger.info(f"Prepared for Marie Caissie, the output of combined_text is: {combined_text}")
     logger.debug(f"reply_text's type is: {type(reply_texts)}")
     logger.debug(f"debug_object_reply's type is: {type(debug_object_reply)}")
@@ -153,7 +153,10 @@ async def post(ctx, message: str):
     logger.debug(f"reply_texts length is: {len(reply_texts)}")
     logger.debug(f"debug_object_reply length is: {len(debug_object_reply)}")
     logger.debug(f"-----------------------------")
-    
+    logger.debug(f"-----------------------------")
+    logger.debug(f"attempting to print the object.......")
+    logger.debug(f"......: {(debug_object_reply)}")
+                 
     data_dict = {}
     for line in debug_object_reply:
       # Assuming each line starts with an emoji followed by the key name and the text

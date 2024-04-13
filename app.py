@@ -156,8 +156,8 @@ async def post(ctx, message: str):
     logger.debug(f"-----------------------------")
     logger.debug(f"attempting to print the object.......")
     #logger.debug(f"......: {(debug_object_reply)}")
-    logger.debug(debug_object_reply)
-                 
+    #logger.debug(debug_object_reply)
+    logger.debug(f"......: {str(debug_object_reply)}")                 
     data_dict = {}
     for line in debug_object_reply:
       # Assuming each line starts with an emoji followed by the key name and the text

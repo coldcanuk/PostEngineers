@@ -81,7 +81,43 @@ async def handle_post_command(message, assistant_id):
         logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
 
-# Event Handlers and Bot Commands go here
+#
+# BEGIN Section Event Handlers
+#
 
-if __name__ == '__main__':
+# event on_ready
+@bot.event
+async def on_ready():
+    logger.info('Bot is online and ready.')
+
+# slash_command post
+@bot.slash_command(name="post", description="Invoke Penelope for a message")
+async def post(ctx, message: str):
+    logger.debug("Received /post command with message: {}", message)
+    await ctx.defer()
+    logger.debug("Defer acknowledged. Proceeding with Penelope's wisdom.")
+
+    # Penelope's Process
+    try:
+        reply_texts = await handle_post_command(message, assistant_id_p)
+        logger.debug("Received reply from Penelope: {}", reply_texts)
+    except Exception as e:
+        logger.error("Failed to retrieve reply from Penelope: {}", e)
+        await ctx.followup.send("Ah, zounds! Encountered an issue invoking Penelope.")
+        return
+
+    if not reply_texts:
+        logger.warning("Empty reply from Penelope. Aborting the quest.")
+        await ctx.followup.send("Penelope seems to be lost in thought. Please try again.")
+        return
+
+    full_reply = " ".join(reply_texts)
+    await ctx.followup.send(full_reply)
+    logger.debug("Dispatched Penelope's reply to the high seas of Discord.")
+
+#
+# END Section Event Handlers
+#
+
+if __name__ == '__main__': # Conditional check to confirm it is the main app running
     bot.run(DISCORD_TOKEN)

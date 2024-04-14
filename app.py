@@ -43,9 +43,13 @@ async def check_run_completion(thread_id, run_id):
 @backoff.on_predicate(backoff.expo, lambda x: x.status not in ['completed', 'failed'], max_time=360)
 async def wait_for_completion(thread_id, run_id):
     """Wait for the OpenAI thread run to complete with backoff."""
+    intCount = 0
     while True:
+        logger.debug(f"We are in the while loop and are interaction: {intCount}")
+        intCount += 1 # Increment the counter by +1
         run_details = await check_run_completion(thread_id, run_id)
         if run_details.status in ['completed', 'failed']:
+            logger.debug(f"run_details.status has matched completed or failed:  {run_details.status}")
             return run_details
         await asyncio.sleep(1)  # Sleep before the next check
 

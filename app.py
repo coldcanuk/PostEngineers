@@ -63,8 +63,8 @@ async def wait_for_completion(thread_id, run_id):
     intCount = 0
     while True:
         logger.debug(f"Beginning of while loop; we are at iteration: {intCount}")
-        logger.debug("Begin asyncio.sleep for 10 seconds")
-        await asyncio.sleep(1)
+        #logger.debug("Begin asyncio.sleep for 10 seconds")
+        #await asyncio.sleep(1)
         intCount += 1
         run_details = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
         logger.debug(f"Checking run completion, status: {run_details.status}")

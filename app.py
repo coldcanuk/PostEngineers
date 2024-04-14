@@ -69,9 +69,11 @@ async def wait_for_completion(thread_id, run_id):
         
         run_details = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
         logger.debug(f"Checking run completion, status: {run_details.status}")
-        if run_details.status in ['completed', 'failed']:
+        if run_details.status in ['completed']:
             logger.debug("run_details.status has matched either completed or failed. Will now attempt return run_details")
             return run_details
+        elif run_details.status in ['failed']:
+            raise RuntimeError(f"Attempting to retrieve the status of the run horribly failed. The eye of Sauron is upon you!")
         intCount += 1
         """
         logger.debug(f"This is delay before:  {delay}")
@@ -117,6 +119,7 @@ async def handle_post_command(message, assistant_id):
         logger.error("Encountered an error in handle_post_command with client.beta.threads.messages.list")
         raise RuntimeError(f"Hit an error in the handle_post_command function with client.beta.threads.messages.list")
     try:
+        logger.debug("Begin populating reply_texts")
         reply_texts = [
             content_block.text.value for msg in listMessages.data 
             if msg.role == 'assistant' 

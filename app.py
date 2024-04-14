@@ -87,7 +87,7 @@ async def handle_post_command(message, assistant_id):
             raise RuntimeError(f"Run did not complete successfully: {run_details.status}")
 
         listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-            
+        logger.debug("Begin adding data into reply_texts")
         reply_texts = [
             content_block.text.value for msg in listMessages.data 
             if msg.role == 'assistant' 
@@ -102,10 +102,6 @@ async def handle_post_command(message, assistant_id):
     except Exception as e:
         logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
-
-
-
-
 
 
 def extract_insight_and_masterpiece(texts):
@@ -145,8 +141,11 @@ async def post(ctx, message: str):
 
     # Extracting Insight and Masterpiece
     insight, masterpiece = extract_insight_and_masterpiece(full_reply)
-    logger.debug("Extracted Insight: '{}', Masterpiece: '{}'", insight, masterpiece)
-
+    #logger.debug("Extracted Insight: '{}', Masterpiece: '{}'", insight, masterpiece)
+    logger.debug("Finished extracting inight and masterpiece")
+    logger.debug(f"length insight:  {len(insight)}")
+    logger.debug(f"length masterpiece:  {len(masterpiece)}")
+    
     if not insight or not masterpiece:
         logger.warning("Failed to extract Insight or Masterpiece. Aborting Marie Caissie's invocation.")
         await ctx.followup.send("Failed to discern Insight or Masterpiece from Penelope's wisdom.")

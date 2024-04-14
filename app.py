@@ -69,10 +69,14 @@ async def wait_for_completion(thread_id, run_id):
         if run_details.status in ['completed', 'failed']:
             logger.debug("run_details.status has matched either completed or failed. Will now attempt return run_details")
             return run_details
+        """
         logger.debug(f"This is delay before:  {delay}")
         await asyncio.sleep(delay)
         delay = min(delay * 2, max_delay)  # Exponentially increase delay, up to a max
         logger.debug(f"This is delay after:   {delay}")
+        """
+        logger.debug("Begin asyncio.sleep for 10 seconds")
+        await asyncio.sleep(10)
 # 
 async def handle_post_command(message, assistant_id):
     """

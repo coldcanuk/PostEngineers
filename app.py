@@ -6,8 +6,6 @@ from discord.ext import commands
 import discord
 from loguru import logger
 from openai import OpenAI
-import json
-import backoff
 
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -67,9 +65,12 @@ async def wait_for_completion(thread_id, run_id):
         run_details = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
         logger.debug(f"Checking run completion, status: {run_details.status}")
         if run_details.status in ['completed', 'failed']:
+            logger.debug("run_details.status has matched either completed or failed. Will now attempt return run_details")
             return run_details
         await asyncio.sleep(delay)
+        logger.debug(f"This is delay before:  {delay}")
         delay = min(delay * 2, max_delay)  # Exponentially increase delay, up to a max
+        logger.debug(f"This is delay after:   {delay}")
 # 
 async def handle_post_command(message, assistant_id):
     """

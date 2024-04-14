@@ -40,7 +40,7 @@ async def check_run_completion(thread_id, run_id):
     """Check if the OpenAI thread run has completed."""
     return await client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
 
-@backoff.on_predicate(backoff.expo, lambda x: x.status not in ['completed', 'failed'], max_time=60)
+@backoff.on_predicate(backoff.expo, lambda x: x.status not in ['completed', 'failed'], max_time=360)
 async def wait_for_completion(thread_id, run_id):
     """Wait for the OpenAI thread run to complete with backoff."""
     while True:

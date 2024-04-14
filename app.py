@@ -37,7 +37,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 logger.info("Finished setting up intents.")
 
 # 
-async def check_run_completion(thread_id, run_id):
+def check_run_completion(thread_id, run_id):
     """
     Asynchronously checks the completion status of a specific run within an OpenAI thread.
 
@@ -64,7 +64,7 @@ async def wait_for_completion(thread_id, run_id):
     while True:
         logger.debug(f"Beginning of while loop; we are at iteration: {intCount}")
         logger.debug("Begin asyncio.sleep for 10 seconds")
-        await asyncio.sleep(10)
+        await asyncio.sleep(1)
         intCount += 1
         run_details = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
         logger.debug(f"Checking run completion, status: {run_details.status}")
@@ -96,19 +96,26 @@ async def handle_post_command(message, assistant_id):
         # Adjusted to directly use response attributes instead of dictionary access
         response = client.beta.threads.create_and_run(
             assistant_id=assistant_id,
-            temperature=1,
-            stream="false",
             thread={"messages": [{"role": "user", "content": message}]}
         )
-
         logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {response.thread_id}")
+    except Exception as e:
+        logger.error("Encountered an error in handle_post_command with client.beta.threads.create_and_run")
+        raise RuntimeError (f"Hit an error in the handle_post_command function with client.beta.threads.create_and_run:  {e}")
+    try:
         run_details = await wait_for_completion(response.thread_id, response.id)
-        
         if run_details.status != 'completed':
             raise RuntimeError(f"Run did not complete successfully: {run_details.status}")
-
+    except Exception as e:
+        logger.error("Encountered an error in handle_post_command with await wait_for_completion")
+        raise RuntimeError (f"Hit an error in the handle_post_command function with wait_for_completion:  {e}")
+    try:
         # Adjusted to fetch messages and then iterate over them to construct reply_texts
         listMessages = client.beta.threads.messages.list(thread_id=response.thread_id)
+    except Exception as e:
+        logger.error("Encountered an error in handle_post_command with client.beta.threads.messages.list")
+        raise RuntimeError(f"Hit an error in the handle_post_command function with client.beta.threads.messages.list")
+    try:
         reply_texts = [
             content_block.text.value for msg in listMessages.data 
             if msg.role == 'assistant' 
@@ -118,10 +125,9 @@ async def handle_post_command(message, assistant_id):
         
         logger.debug("Just before the return of reply_texts")
         return reply_texts
-
     except Exception as e:
-        logger.error("Encountered an error in handle_post_command")
-        raise RuntimeError (f"Hit an error in the handle_post_command function: {e}")
+        logger.error("Encountered an error in handle_post_command with reply_texts and the return")
+        raise RuntimeError (f"Hit an error in the handle_post_command function with reply_texts and the return:  {e}")
 
 #
 # BEGIN Section Event Handlers

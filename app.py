@@ -56,7 +56,7 @@ async def wait_for_completion(thread_id, run_id):
     """
     Awaits the completion of a run in an OpenAI thread, employing a simple exponential backoff strategy for polling.
     """
-    max_delay = 360
+    max_delay = 60
     delay = 1  # Start with a 1 second delay
     intCount = 0
     while True:
@@ -105,8 +105,8 @@ async def handle_post_command(message, assistant_id):
         reply_texts = [
             content_block.text.value for msg in listMessages.data 
             if msg.role == 'assistant' 
-            for content_block in msg.content 
-            if content_block.type == 'text'
+              for content_block in msg.content 
+                if content_block.type == 'text'
         ]
         
         logger.debug("Just before the return of reply_texts")
@@ -115,7 +115,6 @@ async def handle_post_command(message, assistant_id):
     except Exception as e:
         logger.error("Encountered an error in handle_post_command")
         raise RuntimeError (f"Hit an error in the handle_post_command function: {e}")
-        return []
 
 #
 # BEGIN Section Event Handlers
@@ -140,7 +139,6 @@ async def post(ctx, message: str):
     except Exception as e:
         await ctx.followup.send("Ah, zounds! Encountered an issue invoking Penelope.")
         raise RuntimeError(f"Failed to retrieve reply from Penelope: {e}")
-        return
 
     if not reply_texts:
         logger.warning("Empty reply from Penelope. Aborting the quest.")

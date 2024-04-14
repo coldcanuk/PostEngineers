@@ -64,7 +64,7 @@ async def wait_for_completion(thread_id, run_id):
     while True:
         logger.debug(f"We are at iteration: {intCount}")
         intCount += 1
-        run_details = await client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
+        run_details = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
         logger.debug(f"Checking run completion, status: {run_details.status}")
         if run_details.status in ['completed', 'failed']:
             return run_details

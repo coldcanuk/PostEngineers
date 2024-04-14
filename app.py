@@ -96,11 +96,12 @@ async def handle_post_command(message, assistant_id):
         # Adjusted to directly use response attributes instead of dictionary access
         response = client.beta.threads.create_and_run(
             assistant_id=assistant_id,
+            temperature=1,
+            stream="false",
             thread={"messages": [{"role": "user", "content": message}]}
         )
 
         logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {response.thread_id}")
-
         run_details = await wait_for_completion(response.thread_id, response.id)
         
         if run_details.status != 'completed':

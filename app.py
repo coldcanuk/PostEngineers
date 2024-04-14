@@ -119,7 +119,8 @@ async def handle_post_command(message, assistant_id):
         return reply_texts
 
     except Exception as e:
-        logger.error(f"Encountered an error in handle_post_command: {e}")
+        logger.error("Encountered an error in handle_post_command")
+        raise RuntimeError (f"Hit an error in the handle_post_command function: {e}")
         return []
 
 #

@@ -54,7 +54,7 @@ async def check_run_completion(thread_id, run_id):
 
 # 
 
-async def wait_for_completion(thread_id, run_id, client):
+async def wait_for_completion(thread_id, run_id):
     """
     Awaits the completion of a run in an OpenAI thread, employing a simple exponential backoff strategy for polling.
     """

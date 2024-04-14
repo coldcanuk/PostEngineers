@@ -105,6 +105,7 @@ async def handle_post_command(message, assistant_id):
 
 
 def extract_insight_and_masterpiece(texts):
+    logger.debug("BEGIN insight and masterpiece extraction")
     insight_match = re.search("🧠Insight: (.+)", texts)
     masterpiece_match = re.search("✨Masterpiece: (.+)", texts)
     insight = insight_match.group(1) if insight_match else "No insight found."
@@ -143,8 +144,8 @@ async def post(ctx, message: str):
     insight, masterpiece = extract_insight_and_masterpiece(full_reply)
     #logger.debug("Extracted Insight: '{}', Masterpiece: '{}'", insight, masterpiece)
     logger.debug("Finished extracting inight and masterpiece")
-    #logger.debug(f"length insight:  {len(insight)}")
-    #logger.debug(f"length masterpiece:  {len(masterpiece)}")
+    logger.debug(f"length insight:  {len(insight)}")
+    logger.debug(f"length masterpiece:  {len(masterpiece)}")
     
     if not insight or not masterpiece:
         logger.warning("Failed to extract Insight or Masterpiece. Aborting Marie Caissie's invocation.")

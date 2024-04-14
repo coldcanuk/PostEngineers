@@ -87,9 +87,6 @@ async def handle_post_command(message, assistant_id):
             raise RuntimeError(f"Run did not complete successfully: {run_details.status}")
 
         listMessages = client.beta.threads.messages.list(thread_id=varThread_id)
-        
-        if "data" not in listMessages:
-            raise ValueError(f"Malformed response: missing 'data' in messages list.:  {listMessages}")
             
         reply_texts = [
             content_block.text.value for msg in listMessages.data 

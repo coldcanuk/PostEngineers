@@ -62,7 +62,9 @@ async def wait_for_completion(thread_id, run_id):
     delay = 1  # Start with a 1 second delay
     intCount = 0
     while True:
-        logger.debug(f"We are at iteration: {intCount}")
+        logger.debug(f"Beginning of while loop; we are at iteration: {intCount}")
+        logger.debug("Begin asyncio.sleep for 10 seconds")
+        await asyncio.sleep(10)
         intCount += 1
         run_details = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
         logger.debug(f"Checking run completion, status: {run_details.status}")
@@ -75,8 +77,6 @@ async def wait_for_completion(thread_id, run_id):
         delay = min(delay * 2, max_delay)  # Exponentially increase delay, up to a max
         logger.debug(f"This is delay after:   {delay}")
         """
-        logger.debug("Begin asyncio.sleep for 10 seconds")
-        await asyncio.sleep(10)
 # 
 async def handle_post_command(message, assistant_id):
     """

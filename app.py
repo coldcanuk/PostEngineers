@@ -93,7 +93,8 @@ async def handle_post_command(message, assistant_id):
     """
     logger.debug("BEGIN handle_post_function")
     try:
-        response = await client.beta.threads.create_and_run(
+        # Adjusted to directly use response attributes instead of dictionary access
+        response = client.beta.threads.create_and_run(
             assistant_id=assistant_id,
             thread={"messages": [{"role": "user", "content": message}]}
         )
@@ -105,7 +106,8 @@ async def handle_post_command(message, assistant_id):
         if run_details.status != 'completed':
             raise RuntimeError(f"Run did not complete successfully: {run_details.status}")
 
-        listMessages = await client.beta.threads.messages.list(thread_id=response.thread_id)
+        # Adjusted to fetch messages and then iterate over them to construct reply_texts
+        listMessages = client.beta.threads.messages.list(thread_id=response.thread_id)
         reply_texts = [
             content_block.text.value for msg in listMessages.data 
             if msg.role == 'assistant' 
@@ -117,7 +119,7 @@ async def handle_post_command(message, assistant_id):
         return reply_texts
 
     except Exception as e:
-        raise RuntimeError(f"Encountered an error in handle_post_command: {e}")
+        logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
 
 #

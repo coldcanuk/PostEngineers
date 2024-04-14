@@ -41,8 +41,6 @@ async def handle_post_command(message, assistant_id):
     try:
         response = client.beta.threads.create_and_run(
             assistant_id=assistant_id,
-            stream="false",
-            temperature=1,
             thread={"messages": [{"role": "user", "content": message}]}
         )
 

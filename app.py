@@ -71,7 +71,7 @@ async def wait_for_completion(thread_id, run_id):
         intCount += 1
         logger.debug(f"Iteration: {intCount}")
         run_details = await check_run_completion(thread_id, run_id)
-        logger.debug(f"Run status: {run_details.status}")
+        logger.debug(f"Run status: {str(run_details.status)}")
 
         if run_details.status in ['completed', 'failed']:
             logger.debug(f"Run status has matched 'completed' or 'failed': {run_details.status}")

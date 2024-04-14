@@ -45,6 +45,7 @@ def check_run_completion(thread_id, run_id):
 
     Parameters:
     - thread_id (str): The unique identifier for the thread in which the run is taking place.
+    
     - run_id (str): The unique identifier for the specific run whose status is to be checked.
 
     Returns:

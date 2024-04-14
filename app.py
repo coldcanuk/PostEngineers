@@ -50,7 +50,7 @@ async def check_run_completion(thread_id, run_id):
     Returns:
     - run_details (Run): An object containing details about the run, including its current status.
     """
-    return await client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
+    return client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
 
 # 
 async def wait_for_completion(thread_id, run_id):

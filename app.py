@@ -26,7 +26,7 @@ log_level = "DEBUG" if DEBUG_MODE else "INFO"
 logger.remove()  # Removes all handlers
 logger.add(sys.stdout, level=log_level)  # Re-add with the desired level
 
-app = Flask(__name__) # Generate a description for this line
+app = Flask(__name__) # Initialize Flask application
 
 # Configure Discord
 intents = discord.Intents.default()
@@ -41,6 +41,8 @@ async def handle_post_command(message, assistant_id):
     try:
         response = client.beta.threads.create_and_run(
             assistant_id=assistant_id,
+            stream="false",
+            temperature=1,
             thread={"messages": [{"role": "user", "content": message}]}
         )
 
@@ -48,7 +50,8 @@ async def handle_post_command(message, assistant_id):
         logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {varThread_id}")
 
         # Dynamic sleeping with exponential backoff
-        @backoff.on_predicate(backoff.expo, lambda x: x.status not in ['completed', 'failed'], max_time=360)
+        @backoff.on_predicate(backoff.expo, lambda x: x.status not in ['completed', 'failed'], max_time=60)
+        
         async def wait_for_completion(thread_id, run_id):
             return client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
 
@@ -111,5 +114,5 @@ async def post(ctx, message: str):
 # END Section Event Handlers
 #
 
-if __name__ == '__main__': # Generate a description for this line
+if __name__ == '__main__': # Conditional check to confirm it is the main app running
     bot.run(DISCORD_TOKEN)

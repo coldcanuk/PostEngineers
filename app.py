@@ -83,6 +83,7 @@ async def handle_post_command(message, assistant_id):
     """
     Initiates a run with OpenAI's assistant and handles its completion and response retrieval.
 
+
     This function initiates a run by sending a user's message to a specified assistant within the OpenAI API, waits for the run to complete using the 'wait_for_completion' function, and then retrieves the assistant's response. It encapsulates the entire process of communicating with OpenAI's API from run initiation to response collection, handling exceptions and logging essential debugging information along the way.
 
     Parameters:

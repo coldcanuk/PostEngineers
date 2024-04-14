@@ -53,30 +53,23 @@ async def check_run_completion(thread_id, run_id):
     return client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
 
 # 
-async def wait_for_completion(thread_id, run_id):
+
+async def wait_for_completion(thread_id, run_id, client):
     """
-    Awaits the completion of a run in an OpenAI thread, employing an exponential backoff strategy for polling.
-
-    This function continuously checks the status of a given run until it either completes or fails. It leverages the exponential backoff algorithm to dynamically adjust the waiting time between status checks, optimizing the balance between promptness and efficiency in resource usage. Enhanced logging provides detailed insights into each polling iteration, including the current attempt number and the run's status, aiding in debugging and monitoring.
-
-    Parameters:
-    - thread_id (str): The unique identifier for the thread containing the run of interest.
-    - run_id (str): The unique identifier for the run whose completion is awaited.
-
-    Returns:
-    - run_details (Run): An object representing the final state of the run, returned once the run has completed or failed.
+    Awaits the completion of a run in an OpenAI thread, employing a simple exponential backoff strategy for polling.
     """
+    max_delay = 360
+    delay = 1  # Start with a 1 second delay
     intCount = 0
     while True:
+        logger.debug(f"We are at iteration: {intCount}")
         intCount += 1
-        logger.debug(f"Iteration: {intCount}")
-        run_details = await check_run_completion(thread_id, run_id)
-        logger.debug(f"Run status: {str(run_details.status)}")
-
+        run_details = await client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
+        logger.debug(f"Checking run completion, status: {run_details.status}")
         if run_details.status in ['completed', 'failed']:
-            logger.debug(f"Run status has matched 'completed' or 'failed': {run_details.status}")
             return run_details
-        await asyncio.sleep(backoff.expo(max_value=60)(intCount))
+        await asyncio.sleep(delay)
+        delay = min(delay * 2, max_delay)  # Exponentially increase delay, up to a max
 # 
 async def handle_post_command(message, assistant_id):
     """

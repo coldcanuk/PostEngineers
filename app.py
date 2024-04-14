@@ -141,8 +141,8 @@ async def post(ctx, message: str):
         reply_texts = await handle_post_command(message, assistant_id_p)
         logger.debug("Received reply from Penelope: {}", reply_texts)
     except Exception as e:
-        logger.error("Failed to retrieve reply from Penelope: {}", e)
         await ctx.followup.send("Ah, zounds! Encountered an issue invoking Penelope.")
+        raise RuntimeError(f"Failed to retrieve reply from Penelope: {e}")
         return
 
     if not reply_texts:

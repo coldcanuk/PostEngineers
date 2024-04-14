@@ -143,8 +143,8 @@ async def post(ctx, message: str):
     insight, masterpiece = extract_insight_and_masterpiece(full_reply)
     #logger.debug("Extracted Insight: '{}', Masterpiece: '{}'", insight, masterpiece)
     logger.debug("Finished extracting inight and masterpiece")
-    logger.debug(f"length insight:  {len(insight)}")
-    logger.debug(f"length masterpiece:  {len(masterpiece)}")
+    #logger.debug(f"length insight:  {len(insight)}")
+    #logger.debug(f"length masterpiece:  {len(masterpiece)}")
     
     if not insight or not masterpiece:
         logger.warning("Failed to extract Insight or Masterpiece. Aborting Marie Caissie's invocation.")
@@ -154,7 +154,8 @@ async def post(ctx, message: str):
     # Crafting Marie Caissie's Prompt
     combined_text = f"My dearest Marie Caissie, I require your talents. It is with the greatest urgency that I need your artistic brilliance to compose for us a useable image prompt intended for use with an AI image generator. Here is the insight I used: {insight} to develop my masterpiece: {masterpiece}"
     logger.debug("Crafted combined_text for Marie Caissie: {}", combined_text)
-
+    await ctx.defer()
+    logger.debug("Defer Acknowledged. Awaiting for Marie Caissie's magic words")
     # Attempt to invoke Marie Caissie with the crafted prompt
     try:
         marie_reply_texts = await handle_post_command(combined_text, assistant_id_mc)

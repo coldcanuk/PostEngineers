@@ -66,6 +66,9 @@ jobs:
           ASSISTANT_MARIECAISSIE: ${{ secrets.ASSISTANT_MARIECAISSIE}}
           DEBUG_MODE: ${{ secrets.DEBUG_MODE }}
         run: |
+          echo ${{ secrets.AZURE_CLIENT_SECRET }}
+          echo ${{ secrets.AZURE_TENANT_ID }}
+          echo ${{ secrets.AZURE_CLIENT_ID }}
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
           az container create --name postengineers --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/postengineers:latest --cpu 1 --memory 4 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }} --environment-variables OPENAI_API_KEY=$OPENAI_API_KEY DISCORD_TOKEN=$DISCORD_TOKEN ASSISTANT_PENELOPE=$ASSISTANT_PENELOPE ASSISTANT_MARIECAISSIE=$ASSISTANT_MARIECAISSIE DEBUG_MODE=$DEBUG_MODE
           az container start --resource-group rgrouppostengineers --name postengineers

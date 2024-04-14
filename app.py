@@ -67,8 +67,8 @@ async def wait_for_completion(thread_id, run_id):
         if run_details.status in ['completed', 'failed']:
             logger.debug("run_details.status has matched either completed or failed. Will now attempt return run_details")
             return run_details
-        await asyncio.sleep(delay)
         logger.debug(f"This is delay before:  {delay}")
+        asyncio.sleep(delay)
         delay = min(delay * 2, max_delay)  # Exponentially increase delay, up to a max
         logger.debug(f"This is delay after:   {delay}")
 # 

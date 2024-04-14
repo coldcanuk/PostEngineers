@@ -36,24 +36,61 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 logger.info("Finished setting up intents.")
 
+# 
 async def check_run_completion(thread_id, run_id):
-    """Check if the OpenAI thread run has completed."""
+    """
+    Asynchronously checks the completion status of a specific run within an OpenAI thread.
+
+    This function is designed to query the OpenAI API to retrieve the current status of a run given its thread ID and run ID. It serves as a utility to understand whether a submitted run (which could be generating text, processing commands, etc.) has been completed or is still in progress. This is crucial for asynchronous operations where subsequent steps depend on the completion of the run.
+
+    Parameters:
+    - thread_id (str): The unique identifier for the thread in which the run is taking place.
+    - run_id (str): The unique identifier for the specific run whose status is to be checked.
+
+    Returns:
+    - run_details (Run): An object containing details about the run, including its current status.
+    """
     return await client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
 
-@backoff.on_predicate(backoff.expo, lambda x: x.status not in ['completed', 'failed'], max_time=360)
+# 
 async def wait_for_completion(thread_id, run_id):
-    """Wait for the OpenAI thread run to complete with backoff."""
+    """
+    Awaits the completion of a run in an OpenAI thread, employing an exponential backoff strategy for polling.
+
+    This function continuously checks the status of a given run until it either completes or fails. It leverages the exponential backoff algorithm to dynamically adjust the waiting time between status checks, optimizing the balance between promptness and efficiency in resource usage. Enhanced logging provides detailed insights into each polling iteration, including the current attempt number and the run's status, aiding in debugging and monitoring.
+
+    Parameters:
+    - thread_id (str): The unique identifier for the thread containing the run of interest.
+    - run_id (str): The unique identifier for the run whose completion is awaited.
+
+    Returns:
+    - run_details (Run): An object representing the final state of the run, returned once the run has completed or failed.
+    """
     intCount = 0
     while True:
-        logger.debug(f"We are in the while loop and are interaction: {intCount}")
-        intCount += 1 # Increment the counter by +1
+        intCount += 1
+        logger.debug(f"Iteration: {intCount}")
         run_details = await check_run_completion(thread_id, run_id)
-        if run_details.status in ['completed', 'failed']:
-            logger.debug(f"run_details.status has matched completed or failed:  {run_details.status}")
-            return run_details
-        await asyncio.sleep(1)  # Sleep before the next check
+        logger.debug(f"Run status: {run_details.status}")
 
+        if run_details.status in ['completed', 'failed']:
+            logger.debug(f"Run status has matched 'completed' or 'failed': {run_details.status}")
+            return run_details
+        await asyncio.sleep(backoff.expo(max_value=60)(intCount))
+# 
 async def handle_post_command(message, assistant_id):
+    """
+    Initiates a run with OpenAI's assistant and handles its completion and response retrieval.
+
+    This function initiates a run by sending a user's message to a specified assistant within the OpenAI API, waits for the run to complete using the 'wait_for_completion' function, and then retrieves the assistant's response. It encapsulates the entire process of communicating with OpenAI's API from run initiation to response collection, handling exceptions and logging essential debugging information along the way.
+
+    Parameters:
+    - message (str): The content of the message to be processed by the assistant.
+    - assistant_id (str): The unique identifier of the assistant to which the message is sent.
+
+    Returns:
+    - reply_texts (list): A list of strings representing the assistant's response, extracted from the run's final messages.
+    """
     logger.debug("BEGIN handle_post_function")
     try:
         response = await client.beta.threads.create_and_run(
@@ -61,28 +98,26 @@ async def handle_post_command(message, assistant_id):
             thread={"messages": [{"role": "user", "content": message}]}
         )
 
-        varThread_id = response.thread_id
-        varResponse_id = response.id
-        logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {varThread_id}")
+        logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {response.thread_id}")
 
-        run_details = await wait_for_completion(varThread_id, varResponse_id)
+        run_details = await wait_for_completion(response.thread_id, response.id)
         
         if run_details.status != 'completed':
             raise RuntimeError(f"Run did not complete successfully: {run_details.status}")
 
-        listMessages = await client.beta.threads.messages.list(thread_id=varThread_id)
+        listMessages = await client.beta.threads.messages.list(thread_id=response.thread_id)
         reply_texts = [
             content_block.text.value for msg in listMessages.data 
             if msg.role == 'assistant' 
-              for content_block in msg.content 
-                if content_block.type == 'text'
+            for content_block in msg.content 
+            if content_block.type == 'text'
         ]
         
-        logger.debug("just before the return of reply_texts")
+        logger.debug("Just before the return of reply_texts")
         return reply_texts
 
     except Exception as e:
-        #logger.error(f"Encountered an error in handle_post_command: {e}")
+        logger.error(f"Encountered an error in handle_post_command: {e}")
         return []
 
 #

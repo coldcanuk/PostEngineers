@@ -65,12 +65,13 @@ async def wait_for_completion(thread_id, run_id):
         logger.debug(f"Beginning of while loop; we are at iteration: {intCount}")
         #logger.debug("Begin asyncio.sleep for 10 seconds")
         #await asyncio.sleep(1)
-        intCount += 1
+        
         run_details = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
         logger.debug(f"Checking run completion, status: {run_details.status}")
         if run_details.status in ['completed', 'failed']:
             logger.debug("run_details.status has matched either completed or failed. Will now attempt return run_details")
             return run_details
+        intCount += 1
         """
         logger.debug(f"This is delay before:  {delay}")
         await asyncio.sleep(delay)
@@ -157,7 +158,7 @@ async def post(ctx, message: str):
         logger.warning("Empty reply from Penelope. Aborting the quest.")
         await ctx.followup.send("Penelope seems to be lost in thought. Please try again.")
         return
-
+    logger.debug("Getting ready to dispatch Penelope's reply to Discord")
     full_reply = " ".join(reply_texts)
     await ctx.followup.send(full_reply)
     logger.debug("Dispatched Penelope's reply to the high seas of Discord.")

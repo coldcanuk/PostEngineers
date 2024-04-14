@@ -1,6 +1,8 @@
 import sys
 import os
+import re
 import asyncio
+import time
 from flask import Flask
 from discord.ext import commands
 import discord
@@ -68,7 +70,7 @@ async def wait_for_completion(thread_id, run_id):
             logger.debug("run_details.status has matched either completed or failed. Will now attempt return run_details")
             return run_details
         logger.debug(f"This is delay before:  {delay}")
-        asyncio.sleep(delay)
+        await asyncio.sleep(delay)
         delay = min(delay * 2, max_delay)  # Exponentially increase delay, up to a max
         logger.debug(f"This is delay after:   {delay}")
 # 

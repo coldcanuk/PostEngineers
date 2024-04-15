@@ -16,7 +16,7 @@ ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
 assistant_id_p = str(ASSISTANT_PENELOPE)
 ASSISTANT_MARIECAISSIE = os.getenv('ASSISTANT_MARIECAISSIE')
 assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
-version="1.af"
+version="1.ag"
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
@@ -38,7 +38,7 @@ def transform_to_json(raw_data):
     # Initialize an empty list to hold our transformed objects
     transformed_data = []    
     # Strip off the square brackets and split the string into its components
-    entries = raw_data[0].strip('[]').split('\n')
+    entries = raw_data[0].strip('[]').split('\n\n')
     # Initialize an empty dictionary to construct our JSON object
     json_object = {}
     logger.debug("Begin for loop")

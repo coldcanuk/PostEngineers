@@ -8,6 +8,7 @@ from discord.ext import commands
 import discord
 from loguru import logger
 from openai import OpenAI
+import json
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -102,16 +103,17 @@ async def post(ctx, message: str):
       if status == "completed":
         try:
           getRun = client.beta.threads.messages.list(strThreadID)
-          await ctx.followup.send(getRun)
-          logger.debug("Completed send of raw output to Discord.")
+          #await ctx.followup.send(getRun)
+          # logger.debug("Completed send of raw output to Discord.")
+          logger.debug("Completed getting the messages list as getRun")
           logger.debug("Breaking out of while loop")
           break
         except Exception as e:
           await ctx.followup.send("Zap, failed at retrieving the run!")
-          logger.debug("Failed at retrieving run")
+          logger.debug("Failed at retrieving the run!")
           raise RuntimeError(f"Failed to retrieve run using {strThreadID} and {strResponseID}")
     try:
-        logger.debug("Formatting the reply so it looks nice in Discord")
+        logger.debug("Formatting the reply so we can zero in on our content.")
         Preply_texts = [
           content_block.text.value for msg in getRun.data 
             if msg.role == 'assistant' 
@@ -122,7 +124,8 @@ async def post(ctx, message: str):
     except Exception as e:
         logger.debug(f"Failed to format Preply_texts or & send to Discord:  {e}")
         await ctx.followup.send("Failed to format Preply_texts or & send to Discord, weird eh")
-        
+    
+    
         
         
         """

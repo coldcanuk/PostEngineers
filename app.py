@@ -36,102 +36,32 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 logger.info("Finished setting up intents.")
 
-# 
-def check_run_completion(thread_id, run_id):
+#
+def start_createandrun(message, assistant_id):
     """
-    Asynchronously checks the completion status of a specific run within an OpenAI thread.
-
-    This function is designed to query the OpenAI API to retrieve the current status of a run given its thread ID and run ID. It serves as a utility to understand whether a submitted run (which could be generating text, processing commands, etc.) has been completed or is still in progress. This is crucial for asynchronous operations where subsequent steps depend on the completion of the run.
-
-    Parameters:
-    - thread_id (str): The unique identifier for the thread in which the run is taking place.
+    This function starts the create_and_run
     
-    - run_id (str): The unique identifier for the specific run whose status is to be checked.
-
-    Returns:
-    - run_details (Run): An object containing details about the run, including its current status.
-    """
-    return client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
-
-# 
-
-async def wait_for_completion(thread_id, run_id):
-    """
-    Awaits the completion of a run in an OpenAI thread, employing a simple exponential backoff strategy for polling.
-    """
-    max_delay = 60
-    delay = 1  # Start with a 1 second delay
-    intCount = 0
-    while True:
-        logger.debug(f"Beginning of while loop; we are at iteration: {intCount}")
-        #logger.debug("Begin asyncio.sleep for 10 seconds")
-        #await asyncio.sleep(1)
-        
-        run_details = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
-        logger.debug(f"Checking run completion, status: {run_details.status}")
-        if run_details.status in ['completed']:
-            logger.debug("run_details.status has matched either completed or failed. Will now attempt return run_details")
-            return run_details
-        elif run_details.status in ['failed']:
-            raise RuntimeError(f"Attempting to retrieve the status of the run horribly failed. The eye of Sauron is upon you!")
-        intCount += 1
-        """
-        logger.debug(f"This is delay before:  {delay}")
-        await asyncio.sleep(delay)
-        delay = min(delay * 2, max_delay)  # Exponentially increase delay, up to a max
-        logger.debug(f"This is delay after:   {delay}")
-        """
-# 
-async def handle_post_command(message, assistant_id):
-    """
-    Initiates a run with OpenAI's assistant and handles its completion and response retrieval.
-    This function initiates a run by sending a user's message to a specified assistant within the OpenAI API, waits for the run to complete using the 'wait_for_completion' function, and then retrieves the assistant's response. It encapsulates the entire process of communicating with OpenAI's API from run initiation to response collection, handling exceptions and logging essential debugging information along the way.
-
     Parameters:
     - message (str): The content of the message to be processed by the assistant.
     - assistant_id (str): The unique identifier of the assistant to which the message is sent.
-
-    Returns:
-    - reply_texts (list): A list of strings representing the assistant's response, extracted from the run's final messages.
-    """
-    logger.debug("BEGIN handle_post_function")
+    
+    Returns 200ok
+    """ 
+    logger.debug("BEGIN start_createandrun")
     try:
-        # Adjusted to directly use response attributes instead of dictionary access
-        response = client.beta.threads.create_and_run(
-            assistant_id=assistant_id,
-            thread={"messages": [{"role": "user", "content": message}]}
-        )
-        logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {response.thread_id}")
+      response = client.beta.threads.create_and_run(
+        assistant_id=assistant_id,
+        thread={"messages": [{"role": "user", "content": message}]}
+      )
+      logger.debug(f"Run initiated with assistant {assistant_id}, Thread ID: {response.thread_id}")
+      strThreadID=response.thread_id
+      logger.debug(f"Successfully create variable strThreadID and populated it:  {strThreadID}")
+      strResponseID=response.id
+      logger.debug(f"Successfully create variable strResponseID and populated it:  {strResponseID}")
+      return strThreadID, strResponseID
     except Exception as e:
-        logger.error("Encountered an error in handle_post_command with client.beta.threads.create_and_run")
-        raise RuntimeError (f"Hit an error in the handle_post_command function with client.beta.threads.create_and_run:  {e}")
-    try:
-        run_details = await wait_for_completion(response.thread_id, response.id)
-        if run_details.status != 'completed':
-            raise RuntimeError(f"Run did not complete successfully: {run_details.status}")
-    except Exception as e:
-        logger.error("Encountered an error in handle_post_command with await wait_for_completion")
-        raise RuntimeError (f"Hit an error in the handle_post_command function with wait_for_completion:  {e}")
-    try:
-        # Adjusted to fetch messages and then iterate over them to construct reply_texts
-        listMessages = client.beta.threads.messages.list(thread_id=response.thread_id)
-    except Exception as e:
-        logger.error("Encountered an error in handle_post_command with client.beta.threads.messages.list")
-        raise RuntimeError(f"Hit an error in the handle_post_command function with client.beta.threads.messages.list")
-    try:
-        logger.debug("Begin populating reply_texts")
-        reply_texts = [
-            content_block.text.value for msg in listMessages.data 
-            if msg.role == 'assistant' 
-              for content_block in msg.content 
-                if content_block.type == 'text'
-        ]
-        
-        logger.debug("Just before the return of reply_texts")
-        return reply_texts
-    except Exception as e:
-        logger.error("Encountered an error in handle_post_command with reply_texts and the return")
-        raise RuntimeError (f"Hit an error in the handle_post_command function with reply_texts and the return:  {e}")
+      logger.error("Encountered an error in handle_post_command with client.beta.threads.create_and_run")
+      raise RuntimeError (f"Hit an error in the handle_post_command function with client.beta.threads.create_and_run:  {e}")
 
 #
 # BEGIN Section Event Handlers
@@ -148,15 +78,38 @@ async def post(ctx, message: str):
     logger.debug("Received /post command with message: {}", message)
     await ctx.defer()
     logger.debug("Defer acknowledged. Proceeding with Penelope's wisdom.")
-
-    # Penelope's Process
+    intDelay=0
+    # Penelope's create_and_run thread with openAI
     try:
-        reply_texts = await handle_post_command(message, assistant_id_p)
-        logger.debug("Received reply from Penelope: {}", reply_texts)
+      start_createandrun(message, assistant_id_p)
+      strThreadID=start_createandrun.strThreadID
+      strResponseID=start_createandrun.strResponseID
+      logger.debug(f"return strThreadID:  {strThreadID}  and strResponseID:  {strResponseID}")
     except Exception as e:
-        await ctx.followup.send("Ah, zounds! Encountered an issue invoking Penelope.")
-        raise RuntimeError(f"Failed to retrieve reply from Penelope: {e}")
-
+      await ctx.followup.send("Zap. Failed to start the create and run function")
+      raise RuntimeError(f"Failed to start the create and run function:   {e}")
+    # List Penelope's Run
+    try:
+      runsP = client.beta.threads.runs.list(strThreadID)
+      status = runsP.status
+    except Exception as e:
+      await ctx.follow.send("Zap. Failed to list Penelope's Runs!")
+      raise RuntimeError(f"Failed to list Penelope's Runs:    {e}")
+    while status != "completed":
+        logger.debug(f"Inside while loop at interation: {intDelay}")
+        intDelay += 1
+        asyncio.sleep(intDelay)
+    if status == "completed":
+      try:
+        #getRun = client.beta.threads.runs.retrieve(thread_id=strThreadID, run_id=strResponseID)
+        getRun = thread_messages = client.beta.threads.messages.list(strThreadID)
+        await ctx.follow.send(getRun)
+      except Exception as e:
+        await ctx.follow.send("Zap, failed at retrieving the run!")
+        logger.debug("Failed at retrieving run")
+        raise RuntimeError(f"Failed to retrieve run using {strThreadID} and {strResponseID}")
+      
+        """
     if not reply_texts:
         logger.warning("Empty reply from Penelope. Aborting the quest.")
         await ctx.followup.send("Penelope seems to be lost in thought. Please try again.")
@@ -165,7 +118,7 @@ async def post(ctx, message: str):
     full_reply = " ".join(reply_texts)
     await ctx.followup.send(full_reply)
     logger.debug("Dispatched Penelope's reply to the high seas of Discord.")
-
+    """
 #
 # END Section Event Handlers
 #

@@ -1,0 +1,87 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build Docker Image
+        run: docker build . -t postengineers:latest && docker tag postengineers:latest acrpostengineers.azurecr.io/postengineers:latest
+
+      - name: Save Docker Image
+        run: docker save postengineers:latest > postengineers.tar
+
+      - name: Upload Docker Image as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: postengineers-image
+          path: postengineers.tar
+
+  Deploy:
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Download Docker Image Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: postengineers-image
+          path: .
+
+      - name: Load Docker Image
+        run: docker load < postengineers.tar
+
+      - name: Re-tag Docker Image
+        run: docker tag postengineers:latest acrpostengineers.azurecr.io/postengineers:latest
+
+      - name: Docker Login to Azure
+        run: echo "${{ secrets.AZURE_REGISTRY_PASSWORD_1 }}" | docker login acrpostengineers.azurecr.io -u ${{ secrets.AZURE_REGISTRY_USERNAME }} --password-stdin
+
+      - name: Push Docker Image to Azure
+        run: docker push acrpostengineers.azurecr.io/postengineers:latest
+
+      - name: Deploy to Azure Container Instance
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          ASSISTANT_PENELOPE: ${{ secrets.ASSISTANT_PENELOPE }}
+          ASSISTANT_MARIECAISSIE: ${{ secrets.ASSISTANT_MARIECAISSIE}}
+          DEBUG_MODE: ${{ secrets.DEBUG_MODE }}
+          
+        run: |
+          az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+          az container create --name postengineers --resource-group rgrouppostengineers --image acrpostengineers.azurecr.io/postengineers:latest --cpu 1 --memory 4 --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD_1 }} --environment-variables OPENAI_API_KEY=$OPENAI_API_KEY DISCORD_TOKEN=$DISCORD_TOKEN ASSISTANT_PENELOPE=$ASSISTANT_PENELOPE ASSISTANT_MARIECAISSIE=$ASSISTANT_MARIECAISSIE DEBUG_MODE=$DEBUG_MODE
+          az container start --resource-group rgrouppostengineers --name postengineers
+
+  SafetyCheck:
+    needs: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restart PostEngineers
+        env:
+            AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+            AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+            AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+            OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+            DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+        run: |
+            az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+            az container restart --resource-group rgrouppostengineers --name postengineers

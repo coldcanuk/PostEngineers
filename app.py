@@ -99,6 +99,8 @@ async def post(ctx, message: str):
       raise RuntimeError(f"Failed to list Penelope's Runs:    {e}")
     while status != "completed":
         logger.debug(f"Inside while loop at interation: {intStep}  and using a delay of:  {intDelay}")
+        runsP = client.beta.threads.runs.retrieve(thread_id=strThreadID,run_id=strResponseID)
+        status = runsP.status
         asyncio.sleep(intDelay)
         intDelay = min(intDelay * 2, intMaxDelay)
         intstep += 1

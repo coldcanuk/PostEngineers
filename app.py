@@ -51,7 +51,6 @@ def transform_to_json(raw_data):
         
     # Convert our list of objects into a JSON string
     json_data = json.dumps(transformed_data, ensure_ascii=False)
-        
     logger.info("Successfully transformed the data to JSON.")
     return json_data
   except Exception as e:
@@ -152,7 +151,7 @@ async def post(ctx, message: str):
     logger.debug("Next, we are going to try to format the output into JSON")
     try:
       reply_json = transform_to_json(Preply_texts)
-      logger.debug(f"This is the output of reply_json: {reply_json}")
+      #logger.debug(f"This is the output of reply_json: {reply_json}")
       await ctx.followup.send(reply_json)
     except Exception as e:
       logger.debug("Failed to transform into JSON")

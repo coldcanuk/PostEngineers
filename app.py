@@ -78,7 +78,9 @@ async def post(ctx, message: str):
     logger.debug("Received /post command with message: {}", message)
     await ctx.defer()
     logger.debug("Defer acknowledged. Proceeding with Penelope's wisdom.")
-    intDelay=0
+    intDelay=1
+    intMaxDelay=120
+    intStep=0
     # Penelope's create_and_run thread with openAI
     try:
       startmeup = start_createandrun(message, assistant_id_p)
@@ -91,14 +93,14 @@ async def post(ctx, message: str):
     # List Penelope's Run
     try:
       runsP = client.beta.threads.runs.retrieve(thread_id=strThreadID,run_id=strResponseID)
+      status = runsP.status
     except Exception as e:
       await ctx.follow.send("Zap. Failed to list Penelope's Runs!")
       raise RuntimeError(f"Failed to list Penelope's Runs:    {e}")
-    status = runsP.status
     while status != "completed":
-        logger.debug(f"Inside while loop at interation: {intDelay}")
-        intDelay += 1
+        logger.debug(f"Inside while loop at interation: {intStep}  and using a delay of:  {intDelay}")
         asyncio.sleep(intDelay)
+        intDelay = min(intDelay * 2, intMaxDelay)
     if status == "completed":
       try:
         #getRun = client.beta.threads.runs.retrieve(thread_id=strThreadID, run_id=strResponseID)

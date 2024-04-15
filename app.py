@@ -16,7 +16,7 @@ ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
 assistant_id_p = str(ASSISTANT_PENELOPE)
 ASSISTANT_MARIECAISSIE = os.getenv('ASSISTANT_MARIECAISSIE')
 assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
-version="1.ac"
+version="1.ad"
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
@@ -33,6 +33,31 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 logger.debug(f"This is version: {version}")
 logger.info("Finished setting up intents.")
 #
+def transform_to_json(raw_data):
+  try:
+    # Initialize an empty list to hold our transformed objects
+    transformed_data = []    
+    # Strip off the square brackets and split the string into its components
+    entries = raw_data[0].strip('[]').split('\n')
+    # Initialize an empty dictionary to construct our JSON object
+    json_object = {}
+    for entry in entries:
+    # Split each entry into key-value pairs
+      key, value = entry.split(': ', 1)
+      json_object[key] = value
+        
+    # Append the transformed object to our list
+    transformed_data.append(json_object)
+        
+    # Convert our list of objects into a JSON string
+    json_data = json.dumps(transformed_data, ensure_ascii=False)
+        
+    logger.info("Successfully transformed the data to JSON.")
+    return json_data
+  except Exception as e:
+    logger.error(f"An error occurred during transformation: {e}")
+    return None
+      
 def start_createandrun(message, assistant_id):
     """
     This function starts the create_and_run
@@ -124,11 +149,16 @@ async def post(ctx, message: str):
     except Exception as e:
         logger.debug(f"Failed to format Preply_texts or & send to Discord:  {e}")
         await ctx.followup.send("Failed to format Preply_texts or & send to Discord, weird eh")
-    
-    
+    logger.debug("Next, we are going to try to format the output into JSON")
+    try:
+      reply_json = transform_to_json(Preply_texts)
+      logger.debug(f"This is the output of reply_json: {reply_json}")
+      await ctx.followup.send(reply_json)
+    except Exception as e:
+      logger.debug("Failed to transform into JSON")
+      raise RuntimeError("Failed to transform into JSON")
         
-        
-        """
+    """
     if not reply_texts:
         logger.warning("Empty reply from Penelope. Aborting the quest.")
         await ctx.followup.send("Penelope seems to be lost in thought. Please try again.")

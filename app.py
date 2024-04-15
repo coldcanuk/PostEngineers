@@ -159,11 +159,11 @@ async def post(ctx, message: str):
       logger.debug("Failed to transform into JSON")
       raise RuntimeError("Failed to transform into JSON")
     await ctx.followup.send(Preply_json)
-    objPreply = json.loads(Preply_json)
-    strInsight = objPreply[0]#['🎯Goal']
-    fullOut = f"this is the length for 🎯Goal:  {len(strInsight)}"
-    logger.debug(fullOut)
-    #await ctx.followup.send(fullOut)
+    try:
+      logger.debug("Attempting json.loads(Preply_json)")
+      objPreply = json.loads(Preply_json)
+    except Exception as e:
+      raise RuntimeError("Failed at json.loads(Preply_json")
     """
     if not reply_texts:
         logger.warning("Empty reply from Penelope. Aborting the quest.")

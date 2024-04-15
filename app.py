@@ -41,6 +41,7 @@ def transform_to_json(raw_data):
     entries = raw_data[0].strip('[]').split('\n')
     # Initialize an empty dictionary to construct our JSON object
     json_object = {}
+    logger.debug("Begin for loop")
     for entry in entries:
     # Split each entry into key-value pairs
       key, value = entry.split(': ', 1)
@@ -50,6 +51,7 @@ def transform_to_json(raw_data):
     transformed_data.append(json_object)
         
     # Convert our list of objects into a JSON string
+    logger.debug("Begin conversion of our list of objects into a JSON string")
     json_data = json.dumps(transformed_data, ensure_ascii=False)
     logger.info("Successfully transformed the data to JSON.")
     return json_data

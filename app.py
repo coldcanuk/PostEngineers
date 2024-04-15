@@ -90,11 +90,11 @@ async def post(ctx, message: str):
       raise RuntimeError(f"Failed to start the create and run function:   {e}")
     # List Penelope's Run
     try:
-      runsP = client.beta.threads.runs.list(strThreadID)
-      status = runsP.status
+      runsP = client.beta.threads.runs.retrieve(thread_id=strThreadID,run_id=strResponseID)
     except Exception as e:
       await ctx.follow.send("Zap. Failed to list Penelope's Runs!")
       raise RuntimeError(f"Failed to list Penelope's Runs:    {e}")
+    status = runsP.status
     while status != "completed":
         logger.debug(f"Inside while loop at interation: {intDelay}")
         intDelay += 1

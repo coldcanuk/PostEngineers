@@ -16,7 +16,7 @@ ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
 assistant_id_p = str(ASSISTANT_PENELOPE)
 ASSISTANT_MARIECAISSIE = os.getenv('ASSISTANT_MARIECAISSIE')
 assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
-version="1.ae"
+version="1.af"
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
@@ -152,13 +152,13 @@ async def post(ctx, message: str):
         await ctx.followup.send("Failed to format Preply_texts or & send to Discord, weird eh")
     logger.debug("Next, we are going to try to format the output into JSON")
     try:
-      reply_json = transform_to_json(Preply_texts)
-      #logger.debug(f"This is the output of reply_json: {reply_json}")
-      await ctx.followup.send(reply_json)
+      Preply_json = transform_to_json(Preply_texts)
+      logger.debug(f"This is the length of Preply_json: {len(Preply_json)}")
+      print(Preply_json)
     except Exception as e:
       logger.debug("Failed to transform into JSON")
       raise RuntimeError("Failed to transform into JSON")
-        
+    await ctx.followup.send(Preply_json)
     """
     if not reply_texts:
         logger.warning("Empty reply from Penelope. Aborting the quest.")

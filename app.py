@@ -8,7 +8,6 @@ from discord.ext import commands
 import discord
 from loguru import logger
 from openai import OpenAI
-
 # Load environment variables
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -19,15 +18,12 @@ assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
 version="aabbcc"
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
-
 # Setup logging
 DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() in ('true', '1', 't', 'y')
 log_level = "DEBUG" if DEBUG_MODE else "INFO"
 logger.remove()  # Removes all handlers
 logger.add(sys.stdout, level=log_level)  # Re-add with the desired level
-
 app = Flask(__name__)
-
 # Configure Discord
 intents = discord.Intents.default()
 intents.messages = True
@@ -35,7 +31,6 @@ intents.guilds = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 logger.debug(f"This is version: {version}")
 logger.info("Finished setting up intents.")
-
 #
 def start_createandrun(message, assistant_id):
     """
@@ -95,7 +90,7 @@ async def post(ctx, message: str):
       runsP = client.beta.threads.runs.retrieve(thread_id=strThreadID,run_id=strResponseID)
       status = runsP.status
     except Exception as e:
-      await ctx.follow.send("Zap. Failed to list Penelope's Runs!")
+      await ctx.followup.send("Zap. Failed to list Penelope's Runs!")
       raise RuntimeError(f"Failed to list Penelope's Runs:    {e}")
     while status != "completed":
         logger.debug(f"Inside while loop at interation: {intStep}  and using a delay of:  {intDelay}")
@@ -107,10 +102,10 @@ async def post(ctx, message: str):
     if status == "completed":
       try:
         #getRun = client.beta.threads.runs.retrieve(thread_id=strThreadID, run_id=strResponseID)
-        getRun = thread_messages = client.beta.threads.messages.list(strThreadID)
-        await ctx.follow.send(getRun)
+        getRun = client.beta.threads.messages.list(strThreadID)
+        await ctx.followup.send(getRun)
       except Exception as e:
-        await ctx.follow.send("Zap, failed at retrieving the run!")
+        await ctx.followup.send("Zap, failed at retrieving the run!")
         logger.debug("Failed at retrieving run")
         raise RuntimeError(f"Failed to retrieve run using {strThreadID} and {strResponseID}")
       

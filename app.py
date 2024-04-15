@@ -81,9 +81,9 @@ async def post(ctx, message: str):
     intDelay=0
     # Penelope's create_and_run thread with openAI
     try:
-      start_createandrun(message, assistant_id_p)
-      strThreadID=str(strThreadID)
-      strResponseID=str(strResponseID)
+      startmeup = start_createandrun(message, assistant_id_p)
+      strThreadID=startmeup[0]
+      strResponseID=startmeup[1]
       logger.debug(f"return strThreadID:  {strThreadID}  and strResponseID:  {strResponseID}")
     except Exception as e:
       await ctx.followup.send("Zap. Failed to start the create and run function")

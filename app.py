@@ -15,7 +15,7 @@ ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
 assistant_id_p = str(ASSISTANT_PENELOPE)
 ASSISTANT_MARIECAISSIE = os.getenv('ASSISTANT_MARIECAISSIE')
 assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
-version="1.ab"
+version="1.ac"
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
@@ -74,7 +74,7 @@ async def post(ctx, message: str):
     await ctx.defer()
     logger.debug("Defer acknowledged. Proceeding with Penelope's wisdom.")
     intDelay=1
-    intMaxDelay=60
+    intMaxDelay=120
     intStep=0
     # Penelope's create_and_run thread with openAI
     try:
@@ -93,17 +93,25 @@ async def post(ctx, message: str):
       await ctx.followup.send("Zap. Failed to list Penelope's Runs!")
       raise RuntimeError(f"Failed to list Penelope's Runs:    {e}")
     while status != "completed":
-        logger.debug(f"Inside while loop at interation: {intStep}  and using a delay of:  {intDelay}")
-        runsP = client.beta.threads.runs.retrieve(thread_id=strThreadID,run_id=strResponseID)
-        status = runsP.status
-        await asyncio.sleep(intDelay)
-        intDelay = min(intDelay * 2, intMaxDelay)
-        intStep += 1
-    if status == "completed":
-      try:
-        getRun = client.beta.threads.messages.list(strThreadID)
-        await ctx.followup.send(getRun)
-        logger.debug("Completed send of raw output to Discord.")
+      logger.debug(f"Inside while loop at interation: {intStep}  and using a delay of:  {intDelay}")
+      runsP = client.beta.threads.runs.retrieve(thread_id=strThreadID,run_id=strResponseID)
+      status = runsP.status
+      await asyncio.sleep(intDelay)
+      intDelay = min(intDelay * 2, intMaxDelay)
+      intStep += 1
+      if status == "completed":
+        try:
+          getRun = client.beta.threads.messages.list(strThreadID)
+          await ctx.followup.send(getRun)
+          logger.debug("Completed send of raw output to Discord.")
+          logger.debug("Breaking out of while loop")
+          break
+        except Exception as e:
+          await ctx.followup.send("Zap, failed at retrieving the run!")
+          logger.debug("Failed at retrieving run")
+          raise RuntimeError(f"Failed to retrieve run using {strThreadID} and {strResponseID}")
+    try:
+        logger.debug("Formatting the reply so it looks nice in Discord")
         Preply_texts = [
           content_block.text.value for msg in getRun.data 
             if msg.role == 'assistant' 
@@ -111,11 +119,12 @@ async def post(ctx, message: str):
                 if content_block.type == 'text'
         ]
         await ctx.followup.send(Preply_texts)
-      except Exception as e:
-        await ctx.followup.send("Zap, failed at retrieving the run!")
-        logger.debug("Failed at retrieving run")
-        raise RuntimeError(f"Failed to retrieve run using {strThreadID} and {strResponseID}")
-      
+    except Exception as e:
+        logger.debug(f"Failed to format Preply_texts or & send to Discord:  {e}")
+        await ctx.followup.send("Failed to format Preply_texts or & send to Discord, weird eh")
+        
+        
+        
         """
     if not reply_texts:
         logger.warning("Empty reply from Penelope. Aborting the quest.")

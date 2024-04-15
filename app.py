@@ -154,7 +154,7 @@ async def post(ctx, message: str):
     try:
       Preply_json = transform_to_json(Preply_texts)
       logger.debug(f"This is the length of Preply_json: {len(Preply_json)}")
-      print(Preply_json)
+      #print(Preply_json)
     except Exception as e:
       logger.debug("Failed to transform into JSON")
       raise RuntimeError("Failed to transform into JSON")

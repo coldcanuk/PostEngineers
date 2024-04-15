@@ -161,8 +161,8 @@ async def post(ctx, message: str):
     await ctx.followup.send(Preply_json)
     objPreply = json.loads(Preply_json)
     strInsight = objPreply[0]['🎯Goal']
-    fullOut = f"this is the text for 🎯Goal:  {strInsight}"
-    await ctx.followup.send(fullOut)
+    fullOut = f"this is the length for 🎯Goal:  {len(strInsight)}"
+    #await ctx.followup.send(fullOut)
     """
     if not reply_texts:
         logger.warning("Empty reply from Penelope. Aborting the quest.")

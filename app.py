@@ -16,7 +16,7 @@ ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
 assistant_id_p = str(ASSISTANT_PENELOPE)
 ASSISTANT_MARIECAISSIE = os.getenv('ASSISTANT_MARIECAISSIE')
 assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
-version="1.ag"
+version="1.ah"
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
@@ -159,6 +159,10 @@ async def post(ctx, message: str):
       logger.debug("Failed to transform into JSON")
       raise RuntimeError("Failed to transform into JSON")
     await ctx.followup.send(Preply_json)
+    objPreply = json.loads(Preply_json)
+    strInsight = objPreply[0]['🎯Goal']
+    fullOut = f"this is the text for 🎯Goal:  {strInsight}"
+    await ctx.followup.send(fullOut)
     """
     if not reply_texts:
         logger.warning("Empty reply from Penelope. Aborting the quest.")

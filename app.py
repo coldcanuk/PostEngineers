@@ -16,7 +16,7 @@ ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
 assistant_id_p = str(ASSISTANT_PENELOPE)
 ASSISTANT_MARIECAISSIE = os.getenv('ASSISTANT_MARIECAISSIE')
 assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
-version="aaaaaaaaa"
+version="aabb"
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -103,7 +103,7 @@ async def post(ctx, message: str):
         status = runsP.status
         await asyncio.sleep(intDelay)
         intDelay = min(intDelay * 2, intMaxDelay)
-        intstep += 1
+        intStep += 1
     if status == "completed":
       try:
         #getRun = client.beta.threads.runs.retrieve(thread_id=strThreadID, run_id=strResponseID)

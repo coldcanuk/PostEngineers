@@ -84,3 +84,4 @@ jobs:
             DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         run: |
             az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+            az container restart --resource-group rgrouppostengineers --name postengineers

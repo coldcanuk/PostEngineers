@@ -161,7 +161,7 @@ async def post(ctx, message: str):
     await ctx.followup.send(Preply_json)
     objPreply = json.loads(Preply_json)
     strInsight = objPreply[0]['🎯Goal']
-    fullOut = f"this is the length for 🎯Goal:  {len(strInsight)}"
+    #fullOut = f"this is the length for 🎯Goal:  {len(strInsight)}"
     #await ctx.followup.send(fullOut)
     """
     if not reply_texts:

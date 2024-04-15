@@ -104,6 +104,8 @@ async def post(ctx, message: str):
         #getRun = client.beta.threads.runs.retrieve(thread_id=strThreadID, run_id=strResponseID)
         getRun = client.beta.threads.messages.list(strThreadID)
         await ctx.followup.send(getRun)
+        logger.debug("Completed send to discord")
+        await ctx.followup.send(getRun.data)
       except Exception as e:
         await ctx.followup.send("Zap, failed at retrieving the run!")
         logger.debug("Failed at retrieving run")

@@ -16,7 +16,7 @@ ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
 assistant_id_p = str(ASSISTANT_PENELOPE)
 ASSISTANT_MARIECAISSIE = os.getenv('ASSISTANT_MARIECAISSIE')
 assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
-
+version=1
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -33,7 +33,7 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-
+logger.debug(f"This is version: {version}")
 logger.info("Finished setting up intents.")
 
 #
@@ -79,7 +79,7 @@ async def post(ctx, message: str):
     await ctx.defer()
     logger.debug("Defer acknowledged. Proceeding with Penelope's wisdom.")
     intDelay=1
-    intMaxDelay=120
+    intMaxDelay=60
     intStep=0
     # Penelope's create_and_run thread with openAI
     try:
@@ -101,6 +101,7 @@ async def post(ctx, message: str):
         logger.debug(f"Inside while loop at interation: {intStep}  and using a delay of:  {intDelay}")
         asyncio.sleep(intDelay)
         intDelay = min(intDelay * 2, intMaxDelay)
+        intstep += 1
     if status == "completed":
       try:
         #getRun = client.beta.threads.runs.retrieve(thread_id=strThreadID, run_id=strResponseID)

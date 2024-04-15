@@ -15,7 +15,7 @@ ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
 assistant_id_p = str(ASSISTANT_PENELOPE)
 ASSISTANT_MARIECAISSIE = os.getenv('ASSISTANT_MARIECAISSIE')
 assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
-version="aabbcc"
+version="1.ab"
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
@@ -101,11 +101,16 @@ async def post(ctx, message: str):
         intStep += 1
     if status == "completed":
       try:
-        #getRun = client.beta.threads.runs.retrieve(thread_id=strThreadID, run_id=strResponseID)
         getRun = client.beta.threads.messages.list(strThreadID)
         await ctx.followup.send(getRun)
-        logger.debug("Completed send to discord")
-        await ctx.followup.send(getRun.data)
+        logger.debug("Completed send of raw output to Discord.")
+        Preply_texts = [
+          content_block.text.value for msg in getRun.data 
+            if msg.role == 'assistant' 
+              for content_block in msg.content 
+                if content_block.type == 'text'
+        ]
+        await ctx.followup.send(Preply_texts)
       except Exception as e:
         await ctx.followup.send("Zap, failed at retrieving the run!")
         logger.debug("Failed at retrieving run")

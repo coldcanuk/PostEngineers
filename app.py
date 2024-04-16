@@ -16,7 +16,7 @@ ASSISTANT_PENELOPE = os.getenv('ASSISTANT_PENELOPE')
 assistant_id_p = str(ASSISTANT_PENELOPE)
 ASSISTANT_MARIECAISSIE = os.getenv('ASSISTANT_MARIECAISSIE')
 assistant_id_mc = str(ASSISTANT_MARIECAISSIE)
-version="1.am"
+version="1.an"
 # Create the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 # Setup logging
@@ -164,7 +164,7 @@ async def post(ctx, message: str):
       objPreply = json.loads(Preply_json)
       logger.debug(f"The length of objPreply is:  {len(objPreply)}")
       logger.debug(f"The length of objPreply.Goal is: {len(objPreply[0])}")
-      logger.debug(f"The length of objPreply.Goal is: {len(objPreply[0]['Goal'])}")
+      logger.debug(f"{(objPreply)}")
     except Exception as e:
       raise RuntimeError("Failed at json.loads(Preply_json")
     """

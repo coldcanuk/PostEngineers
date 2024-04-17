@@ -163,7 +163,7 @@ async def post(ctx, message: str):
       logger.debug("Attempting json.loads(Preply_json)")
       objPreply = json.loads(Preply_json)
       logger.debug(f"The length of objPreply is:  {len(objPreply)}")
-      logger.debug(f"The length of objPreply[0] is: {len(objPreply[0])}")
+      logger.debug(f"The length of objPreply[0].goal is: {len(objPreply[0].goal)}")
       #logger.debug(f"{(objPreply)}")
     except Exception as e:
       raise RuntimeError("Failed at json.loads(Preply_json")
